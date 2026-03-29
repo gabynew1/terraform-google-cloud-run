@@ -1,6 +1,7 @@
 # Stage 1: Build Angular Frontend
 FROM node:18-alpine AS build-fe
 WORKDIR /app
+ENV NODE_OPTIONS=--openssl-legacy-provider
 COPY angular/package*.json ./
 RUN npm install
 COPY angular/ ./
