@@ -1,4 +1,4 @@
-﻿using EC.Manager.Contracts;
+using EC.Manager.Contracts;
 using EC.Manager.Contracts.Dto;
 using EC.Manager.Notifications.Email.Dto;
 using EC.Utils;
@@ -148,7 +148,7 @@ namespace EC.APIs.Contracts
         [HttpPost]
         public async Task<string> GetMatchList([FromForm] UploadFileDto input)
         {
-            return CommonUtils.GetMatchField(input.File);
+            return await Task.Run(() => CommonUtils.GetMatchField(input.File));
         }
 
         [HttpGet]

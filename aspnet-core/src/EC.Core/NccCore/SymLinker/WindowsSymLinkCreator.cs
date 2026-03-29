@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
@@ -18,17 +18,10 @@ namespace NccCore.SymLinker
             //var linkName = Path.GetFileName(targetPath);
             //linkPath = Path.Combine(linkPath, linkName);
             bool success = false;
-            try
-            {
-                var symbolicLinkType = file ? SymLinkFlag.File : SymLinkFlag.Directory;
-                // allow unprivileged creation symbolic
-                //symbolicLinkType = symbolicLinkType | SymLinkFlag.SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
-                success = CreateSymbolicLink(linkPath, targetPath, symbolicLinkType);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            var symbolicLinkType = file ? SymLinkFlag.File : SymLinkFlag.Directory;
+            // allow unprivileged creation symbolic
+            //symbolicLinkType = symbolicLinkType | SymLinkFlag.SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+            success = CreateSymbolicLink(linkPath, targetPath, symbolicLinkType);
             return success;
         }
 

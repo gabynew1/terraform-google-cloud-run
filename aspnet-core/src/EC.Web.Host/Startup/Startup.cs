@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -64,6 +65,15 @@ namespace EC.Web.Host.Startup
 
             services.AddSignalR();
 
+            // Configure Forwarded Headers for Cloud Run
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                // Clear known networks and proxies so it accepts headers from the Cloud Run proxy
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
             // Configure CORS for angular2 UI
             services.AddCors(
                 options => options.AddPolicy(
@@ -102,6 +112,8 @@ namespace EC.Web.Host.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseForwardedHeaders(); // Must be before UseAbp and other middleware
+            
             app.UseAbp(options => { options.UseAbpRequestLocalization = false; }); // Initializes ABP framework.
 
             app.UseCors(_defaultCorsPolicyName); // Enable CORS!

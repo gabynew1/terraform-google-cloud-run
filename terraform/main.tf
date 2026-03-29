@@ -53,12 +53,12 @@ resource "google_cloud_run_v2_service" "default" {
   }
 }
 
-# Allow specific user access
+# Allow public access
 resource "google_cloud_run_v2_service_iam_member" "noauth" {
   location = google_cloud_run_v2_service.default.location
   name     = google_cloud_run_v2_service.default.name
   role     = "roles/run.invoker"
-  member   = "user:gabriel@zealot.ro"
+  member   = "allUsers"
 }
 
 # Google Cloud Storage Bucket

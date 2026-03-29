@@ -1,4 +1,4 @@
-﻿using Abp.BackgroundJobs;
+using Abp.BackgroundJobs;
 using Abp.Timing;
 using Abp.UI;
 using EC.Authorization.Users;
@@ -173,8 +173,9 @@ namespace EC.Manager.ContractSignings
 
         public async Task<string> GetSignerEmail(long settingId)
         {
-            return WorkScope.GetAll<ContractSetting>()
-                .Where(x => x.Id == settingId).FirstOrDefault().SignerEmail.Trim();
+            var signer = await WorkScope.GetAll<ContractSetting>()
+                .Where(x => x.Id == settingId).FirstOrDefaultAsync();
+            return signer.SignerEmail.Trim();
         }
 
         public SignMethod GetSignMethod(SignatureTypeSetting type)
@@ -317,11 +318,13 @@ namespace EC.Manager.ContractSignings
 
         public async Task<string> SignDigitalSignature(SignFromCertDto input)
         {
-            var cert = CertUtils.getX509Certificate(input.CertSerial);
+            return await Task.Run(() => {
+                var cert = CertUtils.getX509Certificate(input.CertSerial);
 
-            var result = SignUtils.SignPdfFromBase64(input.PdfBase64, input.SignatureBase64, cert, input.Page, input.Position);
+                var result = SignUtils.SignPdfFromBase64(input.PdfBase64, input.SignatureBase64, cert, input.Page, input.Position);
 
-            return result;
+                return result;
+            });
         }
 
         public async Task<string> SignInput(SignInputsDto input)

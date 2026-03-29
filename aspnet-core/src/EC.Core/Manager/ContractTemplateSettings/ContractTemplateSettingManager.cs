@@ -1,4 +1,4 @@
-﻿using Abp.UI;
+using Abp.UI;
 using EC.Entities;
 using EC.Manager.ContractTemplateSettings.Dto;
 using EC.Manager.ContractTemplateSigners.Dto;
@@ -238,7 +238,7 @@ namespace EC.Manager.ContractTemplateSettings
 
         public async Task<List<GetAllSignerLocationDto>> GetAllSignLocation(long contractTemplateId)
         {
-            return WorkScope.GetAll<ContractTemplateSetting>()
+            var query = await WorkScope.GetAll<ContractTemplateSetting>()
                 .Where(x => x.ContractTemplateSigner.ContractTemplateId == contractTemplateId)
                 .Select(x => new
                 {
@@ -270,7 +270,10 @@ namespace EC.Manager.ContractTemplateSettings
                         SignerName = x.ContractTemplateSigner.SignerName,
                         SignerEmail = x.ContractTemplateSigner.SignerEmail
                     }
-                }).GroupBy(x => x.Signer).AsEnumerable()
+                })
+                .ToListAsync();
+
+            return query.GroupBy(x => x.Signer)
                 .Select(x => new GetAllSignerLocationDto
                 {
                     Signer = x.Key,

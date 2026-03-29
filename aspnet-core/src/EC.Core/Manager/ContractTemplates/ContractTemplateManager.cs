@@ -1,4 +1,5 @@
-﻿using Abp.Collections.Extensions;
+using Abp.Collections.Extensions;
+using Abp.Linq.Extensions;
 using Abp.Domain.Uow;
 using Abp.UI;
 using EC.Entities;
@@ -178,8 +179,9 @@ namespace EC.Manager.ContractTemplates
 
         public async Task<GetSignatureForContracttemplateDto> Get(long id)
         {
-            using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
-            {
+            return await Task.Run(() => {
+                using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
+                {
                 var item = WorkScope.GetAll<ContractTemplate>()
                 .Where(x => x.Id == id).FirstOrDefault();
                 var contractTemplate = new GetContractTemplateDto
@@ -240,11 +242,12 @@ namespace EC.Manager.ContractTemplates
                     SignerSettings = signers
                 };
             }
+            });
         }
 
         public async Task<List<GetContractTemplateDto>> GetAll(ContractTemplateFilterType? input)
         {
-            return WorkScope.GetAll<ContractTemplate>()
+            return await WorkScope.GetAll<ContractTemplate>()
                 .OrderBy(x => x.CreationTime)
                 .Select(x => new GetContractTemplateDto
                 {
@@ -264,7 +267,7 @@ namespace EC.Manager.ContractTemplates
                 })
                 .WhereIf(input.HasValue && input.Value == ContractTemplateFilterType.Me, x => x.UserId == AbpSession.UserId)
                 .WhereIf(input.HasValue && input.Value == ContractTemplateFilterType.System, x => x.UserId == null)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<GridResult<GetContractTemplateDto>> GetAllPaging(GetContractTemplateByFilterDto input)

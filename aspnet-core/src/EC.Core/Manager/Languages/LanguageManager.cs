@@ -1,4 +1,4 @@
-﻿using HRMv2.NccCore;
+using HRMv2.NccCore;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using System.IO;
@@ -9,10 +9,10 @@ namespace EC.Manager.Languages
 {
     public class LanguagesManager : BaseManager
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         public LanguagesManager(
             IWorkScope workScope,
-            IHostingEnvironment hostingEnvironment
+            IWebHostEnvironment hostingEnvironment
         ) : base(workScope)
         {
             _hostingEnvironment = hostingEnvironment;

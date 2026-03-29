@@ -1,4 +1,4 @@
-﻿using Abp.BackgroundJobs;
+using Abp.BackgroundJobs;
 using Abp.Domain.Repositories;
 using EC.BackgroundJobs.CancelExpiredContract;
 using EC.BackgroundJobs.SendMail;
@@ -187,15 +187,18 @@ namespace EC.Manager.Notifications.Notification
 
         public async Task RemoveOldJob(long contractId)
         {
-            var jobTypeName = typeof(CancelExpiredContract).FullName;
-            _storeJob.GetAll()
-               .Where(x => x.JobType.Contains(jobTypeName))
-               .Where(x => x.JobArgs.Contains($"\"ContractId\":{contractId}"))
-               .Select(x => x.Id)
-               .ToList().ForEach(x =>
-               {
-                   _backgroundJobManager.Delete(x.ToString());
-               });
+            await Task.Run(() =>
+            {
+                var jobTypeName = typeof(CancelExpiredContract).FullName;
+                _storeJob.GetAll()
+                   .Where(x => x.JobType.Contains(jobTypeName))
+                   .Where(x => x.JobArgs.Contains($"\"ContractId\":{contractId}"))
+                   .Select(x => x.Id)
+                   .ToList().ForEach(x =>
+                   {
+                       _backgroundJobManager.Delete(x.ToString());
+                   });
+            });
         }
     }
 }

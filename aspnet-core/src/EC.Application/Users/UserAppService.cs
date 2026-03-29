@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -103,18 +103,20 @@ namespace EC.Users
         //[AbpAuthorize(PermissionNames.Pages_Users_Activation)]
         public async Task Activate(EntityDto<long> user)
         {
-            await Repository.UpdateAsync(user.Id, async (entity) =>
+            await Repository.UpdateAsync(user.Id, entity =>
             {
                 entity.IsActive = true;
+                return Task.CompletedTask;
             });
         }
 
         //[AbpAuthorize(PermissionNames.Pages_Users_Activation)]
         public async Task DeActivate(EntityDto<long> user)
         {
-            await Repository.UpdateAsync(user.Id, async (entity) =>
+            await Repository.UpdateAsync(user.Id, entity =>
             {
                 entity.IsActive = false;
+                return Task.CompletedTask;
             });
         }
 

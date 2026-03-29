@@ -1,4 +1,4 @@
-﻿using Abp.Application.Services;
+using Abp.Application.Services;
 using Abp.Dependency;
 using Amazon;
 using Amazon.Runtime;
@@ -129,7 +129,7 @@ namespace EC.FileStorageServices
 
         private async Task<string> GetPreSignedUrl(string key)
         {
-            string desiredFileName = await GetFileNameFromKey(key);
+            string desiredFileName = GetFileNameFromKey(key);
             string desiredFileNameEncoded = Uri.EscapeDataString(desiredFileName);
             var s3config= ResetCredential();
             var request = new GetPreSignedUrlRequest
@@ -165,47 +165,47 @@ namespace EC.FileStorageServices
 
         public async Task UploadFile(IFormFile file, string tenantName, FileCategory fileCategory, string guid, int? index)
         {
-            string key = await MakeKey(tenantName, fileCategory, guid, index, file.FileName);
+            string key = MakeKey(tenantName, fileCategory, guid, index, file.FileName);
             await UploadFileToS3(file, key);
         }
 
         public async Task<byte[]> DownloadFile(string tenantName, FileCategory fileCategory, string guid, int? index, string fileName)
         {
-            string key = await MakeKey(tenantName, fileCategory, guid, index, fileName);
+            string key = MakeKey(tenantName, fileCategory, guid, index, fileName);
             return await DownloadFileFromS3(key);
         }
 
         public async Task<List<byte[]>> DownloadMultipleFiles(string tenantName, FileCategory fileCategory, string guid)
         {
-            string prefix = await MakeKey(tenantName, fileCategory, guid, null, null);
+            string prefix = MakeKey(tenantName, fileCategory, guid, null, null);
             return await DownloadMultipleFilesFromS3(prefix);
         }
 
         public async Task DeleteFile(string tenantName, FileCategory fileCategory, string guid, int? index, string fileName)
         {
-            string key = await MakeKey(tenantName, fileCategory, guid, index, fileName);
+            string key = MakeKey(tenantName, fileCategory, guid, index, fileName);
             await DeleteFileFromS3(key);
         }
 
         public async Task DeleteMultipleFiles(string tenantName, FileCategory fileCategory, string guid)
         {
-            string prefix = await MakeKey(tenantName, fileCategory, guid, null, null);
+            string prefix = MakeKey(tenantName, fileCategory, guid, null, null);
             await DeleteMultipleFilesFromS3(prefix);
         }
 
         public async Task<string> GetDirectDownloadUrl(string tenantName, FileCategory fileCategory, string guid, int? index, string fileName)
         {
-            string key = await MakeKey(tenantName, fileCategory, guid, index, fileName);
+            string key = MakeKey(tenantName, fileCategory, guid, index, fileName);
             return await GetPreSignedUrl(key);
         }
 
         public async Task<List<string>> SearchForFiles(string tenantName, FileCategory fileCategory, string guid, int? index, string fileName)
         {
-            string prefix = await MakeKey(tenantName, fileCategory, guid, index, fileName);
+            string prefix = MakeKey(tenantName, fileCategory, guid, index, fileName);
             return await SearchForFilesByPrefix(prefix);
         }
 
-        private async Task<string> MakeKey(string tenantName, FileCategory fileCategory, string guid, int? index, string? fileName)
+        private string MakeKey(string tenantName, FileCategory fileCategory, string guid, int? index, string? fileName)
         {
             var s3config= ResetCredential();
             string key = s3config.Prefix.TrimEnd('/') + '/' + tenantName;
@@ -247,7 +247,7 @@ namespace EC.FileStorageServices
             return key;
         }
 
-        private async Task<string> GetFileNameFromKey(string key)
+        private string GetFileNameFromKey(string key)
         {
             string s3FileName = key.Substring(key.LastIndexOf('/') + 1);
             string fileName = s3FileName.Substring(s3FileName.IndexOf('_', s3FileName.IndexOf('_') + 1) + 1);

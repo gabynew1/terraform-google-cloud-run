@@ -1,4 +1,4 @@
-﻿using EC.Authorization.Users;
+using EC.Authorization.Users;
 using EC.Entities;
 using EC.FileStoringServices;
 using EC.Manager.Contracts;
@@ -87,7 +87,8 @@ namespace EC.Manager.FileStoring
 
         public async Task<string> RenderCertificatePdf(CertificateDto certificate)
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            return await Task.Run(() => {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
 
             var outputFilePath = Path.Combine(webHostEnvironment.ContentRootPath, "wwwroot", "certificatePdf", $"Certificate_{certificate.ContractId}.pdf");
@@ -282,6 +283,7 @@ namespace EC.Manager.FileStoring
             File.Delete(outputFilePath);
 
             return "data:application/pdf;base64," + base64Pdf;
+            });
         }
 
         public async Task<string> DownloadContractAndCertificate(DownloadContractAndCertificateDto input)
@@ -452,9 +454,9 @@ namespace EC.Manager.FileStoring
 
         private async Task<string> GetContractGuid(long contractId)
         {
-            return WorkScope.GetAll<Contract>()
-                .First(x => x.Id.Equals(contractId))
-                .ContractGuid.ToString();
+            var contract = await WorkScope.GetAll<Contract>()
+                .FirstAsync(x => x.Id.Equals(contractId));
+            return contract.ContractGuid.ToString();
         }
 
         public async Task ClearContractDownloadFiles(long contractId)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace EC.Net.MimeTypes
 {
@@ -20,7 +20,7 @@ namespace EC.Net.MimeTypes
         public const string ApplicationEdiX12 = "application/EDI-X12";
         ///<summary>Web Open Font Format; (candidate recommendation; use application/x-font-woff until standard is official)</summary>
         public const string ApplicationFontWoff = "application/font-woff";
-        ///<summary>ECMAScript/JavaScript; Defined in RFC 4329 (equivalent to application/ecmascript but with looser processing rules) It is not accepted in IE 8 or earlier - text/javascript is accepted but it is defined as obsolete in RFC 4329. The "type" attribute of the <script> tag in HTML5 is optional and in practice omitting the media type of JavaScript programs is the most interoperable solution since all browsers have always assumed the correct default even before HTML5.</summary>
+        ///<summary>ECMAScript/JavaScript; Defined in RFC 4329 (equivalent to application/ecmascript but with looser processing rules) It is not accepted in IE 8 or earlier - text/javascript is accepted but it is defined as obsolete in RFC 4329. The "type" attribute of the script tag in HTML5 is optional and in practice omitting the media type of JavaScript programs is the most interoperable solution since all browsers have always assumed the correct default even before HTML5.</summary>
         public const string ApplicationJavascript = "application/javascript";
         ///<summary>JavaScript Object Notation JSON; Defined in RFC 4627</summary>
         public const string ApplicationJson = "application/json";
@@ -181,7 +181,7 @@ namespace EC.Net.MimeTypes
         public const string TextCsv = "text/csv";
         ///<summary>HTML; Defined in RFC 2854</summary>
         public const string TextHtml = "text/html";
-        ///<summary>JavaScript - Defined in and obsoleted by RFC 4329 in order to discourage its usage in favor of application/javascript. However,text/javascript is allowed in HTML 4 and 5 and, unlike application/javascript, has cross-browser support. The "type" attribute of the <script> tag in HTML5 is optional and there is no need to use it at all since all browsers have always assumed the correct default (even in HTML 4 where it was required by the specification).</summary>
+        ///<summary>JavaScript - Defined in and obsoleted by RFC 4329 in order to discourage its usage in favor of application/javascript. However,text/javascript is allowed in HTML 4 and 5 and, unlike application/javascript, has cross-browser support. The "type" attribute of the script tag in HTML5 is optional and there is no need to use it at all since all browsers have always assumed the correct default (even in HTML 4 where it was required by the specification).</summary>
         [Obsolete]
         public const string TextJavascript = "text/javascript";
         ///<summary>Textual data; Defined in RFC 2046 and RFC 3676</summary>

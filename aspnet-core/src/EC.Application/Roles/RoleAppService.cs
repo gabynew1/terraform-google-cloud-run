@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
@@ -216,17 +216,17 @@ namespace EC.Roles
         {
 
 
-            var listUserIdsInRole = _userRoleRepository.GetAll()
+            var listUserIdsInRole = await _userRoleRepository.GetAll()
                 .Where(x => x.RoleId == roleId)
-                .Select(x => x.UserId).ToList();
-            var listUsersNotInRole = _userRepository.GetAll()
+                .Select(x => x.UserId).ToListAsync();
+            var listUsersNotInRole = await _userRepository.GetAll()
                 .Where(x => !listUserIdsInRole.Contains(x.Id))
                 .Select(x => new GetUserNotInRoleDto
                 {
                     UserId = x.Id,
                     EmailAddress = x.EmailAddress,
                     UserName = x.UserName
-                }).Distinct().ToList();
+                }).Distinct().ToListAsync();
             return listUsersNotInRole;
         }
         [AbpAuthorize(PermissionNames.Admin_Role_Edit)]

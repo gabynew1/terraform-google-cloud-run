@@ -1,4 +1,4 @@
-﻿using Abp.BackgroundJobs;
+using Abp.BackgroundJobs;
 using Abp.Collections.Extensions;
 using Abp.Json;
 using Abp.Logging;
@@ -130,9 +130,8 @@ namespace EC.Manager.Contracts
 
         public async Task<bool> CheckContractHasSigned(long contractId)
         {
-            return (WorkScope.GetAll<ContractSigning>()
-                    .Where(s => s.ContractId == contractId && !string.IsNullOrEmpty(s.SignartureBase64))
-                    .ToList()).Any();
+            return await WorkScope.GetAll<ContractSigning>()
+                    .AnyAsync(s => s.ContractId == contractId && !string.IsNullOrEmpty(s.SignartureBase64));
         }
 
         public async Task<object> CheckHasInput(long contractId)
@@ -557,15 +556,18 @@ namespace EC.Manager.Contracts
 
         public async Task<FileBase64Dto> DownLoadMassTemplate()
         {
-            using (var package = new ExcelPackage(new FileInfo(Path.Combine(_webHostEnvironment.WebRootPath, "massTemplate", "Mass_Template_Contract.xlsx"))))
+            return await Task.Run(() =>
             {
-                return new FileBase64Dto
+                using (var package = new ExcelPackage(new FileInfo(Path.Combine(_webHostEnvironment.WebRootPath, "massTemplate", "Mass_Template_Contract.xlsx"))))
                 {
-                    Base64 = Convert.ToBase64String(package.GetAsByteArray()),
-                    FileName = "Mass_Contract_Template.xlsx",
-                    FileType = "application/vnd.ms-excel"
-                };
-            }
+                    return new FileBase64Dto
+                    {
+                        Base64 = Convert.ToBase64String(package.GetAsByteArray()),
+                        FileName = "Mass_Contract_Template.xlsx",
+                        FileType = "application/vnd.ms-excel"
+                    };
+                }
+            });
         }
 
         public async Task<GetContractDto> Get(long id)
@@ -610,9 +612,9 @@ namespace EC.Manager.Contracts
         public async Task<List<GetSignersDto>> GetAllSigners()
         {
             var userId = AbpSession.UserId;
-            var userEmail = WorkScope.GetAsync<User>(userId.Value).Result.EmailAddress;
+            var userEmail = (await WorkScope.GetAsync<User>(userId.Value)).EmailAddress;
 
-            var query = WorkScope.GetAll<ContractSetting>()
+            var query = await WorkScope.GetAll<ContractSetting>()
                 .Where(x => x.Contract.UserId == userId && x.ContractRole != ContractRole.Viewer)
                 .Select(x => new
                 {
@@ -623,16 +625,17 @@ namespace EC.Manager.Contracts
                         //Name = x.SignerName
                     }
                 })
-                .ToList()
-                .GroupBy(x => x.Signer)
+                .ToListAsync();
+            
+            var result = query.GroupBy(x => x.Signer)
                 .Select(x => new GetSignersDto
                 {
                     Email = x.Key.Email,
 
                     //Name = x.Key.Name
                 }).ToList();
-            query = query.Where(x => x.Email != userEmail).ToList();
-            return query;
+            result = result.Where(x => x.Email != userEmail).ToList();
+            return result;
         }
 
         public async Task<GridResult<GetContractDto>> GetContractByFilterPaging(GetContractByFilterDto input)
@@ -1119,11 +1122,12 @@ namespace EC.Manager.Contracts
 
         public async Task<string> RenderCertificatePdf(CertificateDto certificate)
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            return await Task.Run(() => {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
+                TimeZoneInfo localTimeZone = TimeZoneInfo.Local;
 
-            var outputFilePath = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "certificatePdf", $"Certificate_{certificate.ContractId}.pdf");
+                var outputFilePath = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "certificatePdf", $"Certificate_{certificate.ContractId}.pdf");
 
             iTextSharp.text.Document document = new iTextSharp.text.Document(PageSize.A4, 10, 10, 20, 20);
 
@@ -1309,12 +1313,12 @@ namespace EC.Manager.Contracts
 
             document.Close();
 
-            byte[] fileBytes = File.ReadAllBytes(outputFilePath);
-            string base64Pdf = Convert.ToBase64String(fileBytes);
+                string base64Certificate = Convert.ToBase64String(System.IO.File.ReadAllBytes(outputFilePath));
 
-            File.Delete(outputFilePath);
+                System.IO.File.Delete(outputFilePath);
 
-            return "data:application/pdf;base64," + base64Pdf;
+                return "data:application/pdf;base64," + base64Certificate;
+            });
         }
 
         public async Task ResendMailAll(long contractId)
@@ -1725,29 +1729,31 @@ namespace EC.Manager.Contracts
 
         private async Task ConvertToPdf(string filePath, string outputPdfPath)
         {
-            string libreOfficePath = _appConfiguration.GetValue<string>("LibreOfficeDir");
-            Logger.Log(LogSeverity.Debug, $"outputPdfPath Location: {outputPdfPath}");
+            await Task.Run(() => {
+                string libreOfficePath = _appConfiguration.GetValue<string>("LibreOfficeDir");
+                Logger.Log(LogSeverity.Debug, $"outputPdfPath Location: {outputPdfPath}");
 
-            string command = $" --headless --convert-to pdf " + $"\"{filePath}\"" + " --outdir " + $"\"{outputPdfPath}\"";
+                string command = $" --headless --convert-to pdf " + $"\"{filePath}\"" + " --outdir " + $"\"{outputPdfPath}\"";
 
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo
-            {
-                FileName = "soffice",
-                Arguments = command,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            process.StartInfo = startInfo;
-            Logger.Log(LogSeverity.Debug, $"Command: {command}");
-            process.Start();
-            string stdout = process.StandardOutput.ReadToEnd();
-            string stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            Logger.Log(LogSeverity.Debug, $"Error process: {stderr}");
-            Logger.Log(LogSeverity.Debug, $"Output process: {stdout}");
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = "soffice",
+                    Arguments = command,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                process.StartInfo = startInfo;
+                Logger.Log(LogSeverity.Debug, $"Command: {command}");
+                process.Start();
+                string stdout = process.StandardOutput.ReadToEnd();
+                string stderr = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                Logger.Log(LogSeverity.Debug, $"Error process: {stderr}");
+                Logger.Log(LogSeverity.Debug, $"Output process: {stdout}");
+            });
         }
 
         private CreaContractHistoryDto CreateContractHistory(string loginUserEmail, long contractId, string receiver, ContractRole contractRole, bool IsReSent = false)

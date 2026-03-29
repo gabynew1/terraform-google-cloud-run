@@ -120,7 +120,7 @@ namespace EC.Manager.LookupPage
             {
                 guid = Guid.Parse(input.Guid);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return null;
             }
