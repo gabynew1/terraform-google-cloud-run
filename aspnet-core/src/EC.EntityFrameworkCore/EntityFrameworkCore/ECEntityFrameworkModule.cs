@@ -1,4 +1,4 @@
-﻿using Abp.EntityFrameworkCore.Configuration;
+using Abp.EntityFrameworkCore.Configuration;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Abp.Zero.EntityFrameworkCore;

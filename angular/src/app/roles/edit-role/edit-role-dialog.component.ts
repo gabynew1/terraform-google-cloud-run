@@ -19,8 +19,7 @@ import {
   RoleDto,
   PermissionDto,
   RoleEditDto,
-  FlatPermissionDto,
-  Permission,
+  SystemPermission,
   RolePermissionDto,
 } from "@shared/service-proxies/service-proxies";
 import { MatTreeNestedDataSource } from "@angular/material/tree";
@@ -69,12 +68,12 @@ export class EditRoleDialogComponent extends AppComponentBase
     private EcTranslatePipe : EcTranslatePipe
   ) {
     super(injector);
-    this.dataSource = new MatTreeNestedDataSource<Permission>();
-    this.treeControl = new NestedTreeControl<Permission>(
+    this.dataSource = new MatTreeNestedDataSource<SystemPermission>();
+    this.treeControl = new NestedTreeControl<SystemPermission>(
       (node) => node.childrens
     );
   }
-  hasChild = (_: number, node: Permission) =>
+  hasChild = (_: number, node: SystemPermission) =>
     !!node.childrens && node.childrens.length > 0;
 
   ngOnInit() {
@@ -119,7 +118,7 @@ export class EditRoleDialogComponent extends AppComponentBase
     return permissions;
   }
 
-  initSelectionList(node: Permission) {
+  initSelectionList(node: SystemPermission) {
     const selectedList = this.grantedPermissionNames as any;
     if (selectedList.includes(node.name)) {
       this.selected(node);
@@ -131,18 +130,18 @@ export class EditRoleDialogComponent extends AppComponentBase
       node.childrens.forEach((child) => this.initSelectionList(child));
     }
   }
-  isSelected(node: Permission) {
+  isSelected(node: SystemPermission) {
     return this.selection.isSelected(node.name);
   }
 
-  deselected(node: Permission) {
+  deselected(node: SystemPermission) {
     this.selection.deselect(node.name);
   }
-  selected(node: Permission) {
+  selected(node: SystemPermission) {
     this.selection.select(node.name);
   }
 
-  descendantsAllSelected(node: Permission): boolean {
+  descendantsAllSelected(node: SystemPermission): boolean {
     const descendants = this.treeControl.getDescendants(node);
     const descAllSelected = descendants.every((child) =>
       this.isSelected(child)
@@ -151,19 +150,19 @@ export class EditRoleDialogComponent extends AppComponentBase
     return descAllSelected;
   }
 
-  descendantsPartiallySelected(node: Permission): boolean {
+  descendantsPartiallySelected(node: SystemPermission): boolean {
     const descendants = this.treeControl.getDescendants(node);
     const result = descendants.some((child) => this.isSelected(child));
     return result && !this.descendantsAllSelected(node);
   }
 
-  todoLeafItemSelectionToggle(node: Permission) {
+  todoLeafItemSelectionToggle(node: SystemPermission) {
     this.isSelected(node) ? this.deselected(node) : this.selected(node);
     this.descendantsPartiallySelected(node);
     this.onSaveData(node);
   }
 
-  todoItemSelectionToggle(node: Permission) {
+  todoItemSelectionToggle(node: SystemPermission) {
     this.isSelected(node) ? this.deselected(node) : this.selected(node);
     const descendants = this.treeControl.getDescendants(node);
     descendants.forEach((child) => {
@@ -180,7 +179,7 @@ export class EditRoleDialogComponent extends AppComponentBase
     });
   }
 
-  selectOrDeselectTheIndeterminateParent(node: Permission, doSelect: boolean) {
+  selectOrDeselectTheIndeterminateParent(node: SystemPermission, doSelect: boolean) {
     if (!node.childrens || node.childrens.length < 1) {
       return;
     }
@@ -214,19 +213,19 @@ export class EditRoleDialogComponent extends AppComponentBase
     });
   }
 
-  onSaveData(node: Permission) {
-    node.isTableLoading = true;
+  onSaveData(node: SystemPermission) {
+    (node as any).isTableLoading = true;
     let descendants = this.treeControl.getDescendants(node);
     if (descendants) {
-      descendants.forEach((child) => (child.isTableLoading = true));
+      descendants.forEach((child) => ((child as any).isTableLoading = true));
     }
     this.selectOrDeselectAllIndeterminateParents(true);
     this.permissions.permissions = this.selection.selected;
     this.permissions.id = this.role.id;
     this._roleService.changeRolePermission(this.permissions).subscribe(() => {
-      node.isTableLoading = false;
+      (node as any).isTableLoading = false;
       if (descendants) {
-        descendants.forEach((child) => (child.isTableLoading = false));
+        descendants.forEach((child) => ((child as any).isTableLoading = false));
       }
     });
   }

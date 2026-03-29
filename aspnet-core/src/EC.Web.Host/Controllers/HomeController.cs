@@ -20,7 +20,7 @@ namespace EC.Web.Host.Controllers
 
         public IActionResult Index()
         {
-            return Redirect("/swagger");
+            return File("~/index.html", "text/html");
         }
 
         /// <summary>

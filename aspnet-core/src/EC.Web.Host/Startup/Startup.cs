@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
@@ -134,6 +134,26 @@ namespace EC.Web.Host.Startup
                     .GetManifestResourceStream("EC.Web.Host.wwwroot.swagger.ui.index.html");
                 options.DisplayRequestDuration(); // Controls the display of the request duration (in milliseconds) for "Try it out" requests.  
             }); // URL: /swagger
+
+            // Serve the Angular app as static files from wwwroot
+            if (!env.IsDevelopment())
+            {
+                app.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = "wwwroot";
+                    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                    {
+                        OnPrepareResponse = ctx =>
+                        {
+                            // Static files should be cached, but index.html should not (to handle routing correctly)
+                            if (ctx.File.Name.EndsWith(".html"))
+                            {
+                                ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+                            }
+                        }
+                    };
+                });
+            }
         }
         
         private void ConfigureSwagger(IServiceCollection services)
@@ -196,6 +216,10 @@ namespace EC.Web.Host.Startup
             {
                 services.AddAWSService<IAmazonS3>();
                 services.AddTransient<IFileStoringService, AWSS3Service>();
+            }
+            else if (FileStoringConstants.Provider == FileStoringConstants.GCS)
+            {
+                services.AddTransient<IFileStoringService, GCSService>();
             }
         }
 

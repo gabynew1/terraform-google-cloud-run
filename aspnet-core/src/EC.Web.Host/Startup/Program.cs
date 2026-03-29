@@ -1,4 +1,4 @@
-﻿using Abp.AspNetCore.Dependency;
+using Abp.AspNetCore.Dependency;
 using Abp.Dependency;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -18,10 +18,15 @@ namespace EC.Web.Host.Startup
             AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            // Cloud Run injects $PORT; fall back to 8080 for local/Docker usage
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            var url = $"http://0.0.0.0:{port}";
+
             return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls(url);
                 })
                 .UseCastleWindsor(IocManager.Instance.IocContainer);
         }

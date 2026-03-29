@@ -1,0 +1,11 @@
+.git
+.vscode
+google-cloud-sdk/
+dotnet/
+terraform/
+terraform_1.5.7_linux_amd64.zip
+**/node_modules/
+**/bin/
+**/obj/
+_screenshots/
+*.zip

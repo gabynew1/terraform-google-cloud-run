@@ -1,0 +1,15 @@
+.git
+.vscode
+google-cloud-sdk/
+dotnet/
+terraform/
+terraform_1.5.7_linux_amd64.zip
+angular/node_modules/
+angular/dist/
+aspnet-core/src/**/bin/
+aspnet-core/src/**/obj/
+**/node_modules/
+**/dist/
+**/bin/
+**/obj/
+!aspnet-core/src/EC.Web.Host/wwwroot/
