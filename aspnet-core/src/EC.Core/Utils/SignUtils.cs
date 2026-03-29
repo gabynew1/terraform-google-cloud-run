@@ -1,4 +1,4 @@
-﻿using Abp.UI;
+using Abp.UI;
 using AngleSharp.Text;
 using EC.Manager.ContractSignings.Dto;
 using iTextSharp.text;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
@@ -54,20 +54,15 @@ namespace EC.Utils
                     
                     byte[] imageBytes = Convert.FromBase64String(signatureBase64.Split(",")[1]);
 
-                    using (MemoryStream imageStream = new MemoryStream(imageBytes))
+                    iTextSharp.text.Image itextImage = iTextSharp.text.Image.GetInstance(imageBytes);
+                    if(itextImage == null)
                     {
-                        System.Drawing.Image backgroundImage = System.Drawing.Image.FromStream(imageStream);
-
-                        if(backgroundImage == null)
-                        {
-                            throw new UserFriendlyException("Không convert được ảnh background chữ ký số");
-                        }
-
-                        iTextSharp.text.Image itextImage = iTextSharp.text.Image.GetInstance(backgroundImage, System.Drawing.Imaging.ImageFormat.Png);
-                        signatureAppearance.Image = itextImage;
-                        signatureAppearance.Image.SetAbsolutePosition(0, 0);
-                        signatureAppearance.Image.Alignment = iTextSharp.text.Element.ALIGN_LEFT;
+                        throw new UserFriendlyException("Không convert được ảnh background chữ ký số");
                     }
+
+                    signatureAppearance.Image = itextImage;
+                    signatureAppearance.Image.SetAbsolutePosition(0, 0);
+                    signatureAppearance.Image.Alignment = iTextSharp.text.Element.ALIGN_LEFT;
 
                     IExternalSignature externalSignature = new X509Certificate2Signature(cert, "SHA-256");
 
@@ -115,12 +110,7 @@ namespace EC.Utils
             }
         }
 
-        public static X509Certificate2 GetCertificate()
-        {
-            var certInfo = CertUtils.getCertificate();
-            var serial = certInfo.CertSerial;
-            return CertUtils.getX509Certificate(serial);
-        }
+
 
         public static string GetPathFontFamily(string fontFamily)
         {
@@ -221,8 +211,11 @@ namespace EC.Utils
                     int numberOfPage = reader.NumberOfPages;
 
                     PdfContentByte content;
-                    Color color = ColorTranslator.FromHtml(input.Color);
-                    BaseColor baseColor = new BaseColor(color.R, color.G, color.B);
+                    string hex = input.Color.StartsWith("#") ? input.Color.Substring(1) : input.Color;
+                    int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+                    int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+                    int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+                    BaseColor baseColor = new BaseColor(r, g, b);
 
                     if (input.IsCreateContract.HasValue && input.IsCreateContract.Value)
                     {

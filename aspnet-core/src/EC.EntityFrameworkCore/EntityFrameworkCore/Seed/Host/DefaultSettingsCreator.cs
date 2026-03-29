@@ -4,6 +4,7 @@ using Abp.Configuration;
 using Abp.Localization;
 using Abp.MultiTenancy;
 using Abp.Net.Mail;
+using EC.Configuration;
 
 namespace EC.EntityFrameworkCore.Seed.Host
 {
