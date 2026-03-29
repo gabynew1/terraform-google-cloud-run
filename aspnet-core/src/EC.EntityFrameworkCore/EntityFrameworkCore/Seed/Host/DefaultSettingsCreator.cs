@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Abp.Configuration;
 using Abp.Localization;
@@ -31,6 +31,10 @@ namespace EC.EntityFrameworkCore.Seed.Host
 
             // Languages
             AddSettingIfNotExists(LocalizationSettingNames.DefaultLanguage, "en", tenantId);
+
+            // Login
+            AddSettingIfNotExists(AppSettingNames.EnableNormalLogin, "true", tenantId);
+            AddSettingIfNotExists(AppSettingNames.EnableLoginMezon, "false", tenantId);
         }
 
         private void AddSettingIfNotExists(string name, string value, int? tenantId = null)
