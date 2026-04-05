@@ -146,3 +146,14 @@ Required substitution variables:
 ![MetaSign1](_screenshots/MetaSign1.png)
 ![MetaSign2](_screenshots/MetaSign2.png)
 ![MetaSign3](_screenshots/MetaSign3.png)
+
+---
+
+## Development & Maintenance
+
+This project includes specialized documentation and agent-led workflows for long-term stability:
+
+- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)**: Overview of the 2026 Localization & Stabilization effort.
+- **[MAINTENANCE_GUIDE.md](MAINTENANCE_GUIDE.md)**: How to manage the localization system (XML sources).
+- **[TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md)**: Common PDF and storage issues.
+- **`.agents/workflows/`**: Automated routines for deployment, safety checks, and validation.
