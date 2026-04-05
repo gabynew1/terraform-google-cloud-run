@@ -37,6 +37,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 WORKDIR /app
 COPY --from=build-be /app/publish .
 
+# Install necessary dependencies for System.Drawing.Common (used by iTextSharp) on Linux
+RUN apt-get update && apt-get install -y libgdiplus libc6-dev fontconfig && rm -rf /var/lib/apt/lists/*
+
 # Cloud Run environment variables
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production

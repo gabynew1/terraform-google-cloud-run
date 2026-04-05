@@ -23,7 +23,6 @@ steps:
     id: 'run-migrations'
     allowFailure: true # Set to false once connection is verified
 
-  # Step 4: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -34,6 +33,7 @@ steps:
       - '--region=${_REGION}'
       - '--platform=managed'
       - '--allow-unauthenticated'
+      - '--memory=1Gi'
     id: 'deploy-service'
 
 images:
