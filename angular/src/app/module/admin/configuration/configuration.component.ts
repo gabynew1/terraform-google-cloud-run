@@ -295,7 +295,7 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
   saveChangeEmail(data: any) {
     this.configurationService.setEmailSetting({ ...data, enableSsl: this.isCheckedEnableSsl.toString(), useDefaultCredentials: this.isCheckedUseDefault.toString() }).subscribe(res => {
       this.emailSetting = { ...data, enableSsl: this.isCheckedEnableSsl.toString(), useDefaultCredentials: this.isCheckedUseDefault.toString() }
-      abp.notify.success("Chỉnh sửa email thành công")
+      abp.notify.success("Email edited successfully")
     })
     this.isDisabledFormEmail = true
     this.isDisabledFormEmail ? this.formEmailSetting.disable() : this.formEmailSetting.enable()
@@ -427,7 +427,7 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
 
   generateApiKey() {
     this._apikeyService.GenerateApiKey().subscribe(rs => {
-      abp.message.success(`Generate thành công, api key của bạn là:<h5>${rs.result}</h5>`, "Success", { isHTML: true })
+      abp.message.success(`Generated successfully, your API key is:<h5>${rs.result}</h5>`, "Success", { isHTML: true })
       this.getApiKey()
     })
   }

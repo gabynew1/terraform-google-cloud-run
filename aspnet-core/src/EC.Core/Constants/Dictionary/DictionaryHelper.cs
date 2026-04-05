@@ -1,4 +1,4 @@
-﻿using EC.Manager.Notifications.Templates.Dto;
+using EC.Manager.Notifications.Templates.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace EC.Constants.Dictionary
                 {
                     Name = "Signing mail",
                     Description = "",
-                    Subject = "[NCC]_Contract_mail",
+                    Subject = "[Metasign] Contract Mail",
                 }
             },
         };

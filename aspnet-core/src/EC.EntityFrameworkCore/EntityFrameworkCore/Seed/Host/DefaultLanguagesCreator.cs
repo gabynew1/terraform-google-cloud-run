@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Abp.Localization;
@@ -30,7 +30,7 @@ namespace EC.EntityFrameworkCore.Seed.Host
                 new ApplicationLanguage(tenantId, "es-MX", "Español México", "famfamfam-flags mx"),
                 new ApplicationLanguage(tenantId, "nl", "Nederlands", "famfamfam-flags nl"),
                 new ApplicationLanguage(tenantId, "ja", "日本語", "famfamfam-flags jp"),*/
-                new ApplicationLanguage(tenantId, "vn", "Vietnamese", "famfamfam-flags vn")
+                new ApplicationLanguage(tenantId, "ro", "Romanian", "famfamfam-flags ro")
             };
         }
 
@@ -57,6 +57,20 @@ namespace EC.EntityFrameworkCore.Seed.Host
             if (_context.Languages.IgnoreQueryFilters().Any(l => l.TenantId == language.TenantId && l.Name == language.Name))
             {
                 return;
+            }
+
+            // If we are adding Romanian, check if Vietnamese exists and replace it
+            if (language.Name == "ro")
+            {
+                var vietnamese = _context.Languages.IgnoreQueryFilters().FirstOrDefault(l => l.TenantId == language.TenantId && l.Name == "vn");
+                if (vietnamese != null)
+                {
+                    vietnamese.Name = language.Name;
+                    vietnamese.DisplayName = language.DisplayName;
+                    vietnamese.Icon = language.Icon;
+                    _context.SaveChanges();
+                    return;
+                }
             }
 
             _context.Languages.Add(language);

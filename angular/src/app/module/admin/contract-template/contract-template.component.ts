@@ -139,7 +139,7 @@ export class ContractTemplateComponent extends PagedListingComponentBase<any> im
 
 
   onDelete(template: ContractTemplates) {
-    abp.message.confirm(`Bạn có chắc muốn xóa template <strong>${template.name}</strong>?`, "", rs => {
+    abp.message.confirm(`Are you sure you want to delete template <strong>${template.name}</strong>?`, "", rs => {
       if (rs) {
         this.contractTemplateService.delete(template.id).subscribe(rs => {
           abp.notify.success("Delete successful")

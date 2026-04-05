@@ -65,7 +65,7 @@ export class ContractInvalidateDialogComponent
         })
       }
     } else {
-      abp.message.error("điền ký tự vào hợp đồng");
+      abp.message.error("fill characters into contract");
     }
   }
 }

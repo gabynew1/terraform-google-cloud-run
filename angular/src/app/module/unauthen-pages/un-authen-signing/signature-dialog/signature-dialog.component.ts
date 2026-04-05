@@ -339,8 +339,8 @@ export class SignatureDialogComponent implements OnInit {
   }
 
   setResponsiveResizeToWidth() {
-    // Thực hiện logic để tính toán giá trị responsiveResizeToWidth dựa trên kích thước cửa sổ
-    // Ví dụ:
+    // Implement logic to calculate responsiveResizeToWidth based on window size
+    // Example:
     const windowWidth = window.innerWidth;
     this.responsiveResizeToWidth = windowWidth < 820 ? 250 : 550;
   }

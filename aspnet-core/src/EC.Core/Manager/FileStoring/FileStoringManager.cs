@@ -110,7 +110,7 @@ namespace EC.Manager.FileStoring
             Font fontNormal = new Font(customFont, 10, Font.NORMAL);
             Font fontBold = new Font(customFont, 12, Font.BOLD);
 
-            PdfPCell signatureCertificate = new PdfPCell(new Phrase("LỊCH SỬ KÝ TÀI LIỆU", new Font(customFont, 16, Font.BOLD)));
+            PdfPCell signatureCertificate = new PdfPCell(new Phrase("DOCUMENT SIGNING HISTORY", new Font(customFont, 16, Font.BOLD)));
             signatureCertificate.Colspan = 3;
             signatureCertificate.HorizontalAlignment = Element.ALIGN_CENTER;
             signatureCertificate.BorderWidth = 0f;
@@ -123,7 +123,7 @@ namespace EC.Manager.FileStoring
             contractGuid.PaddingBottom = 3f;
             table.AddCell(contractGuid);
 
-            PdfPCell contractName = new PdfPCell(new Phrase($"Tên hợp đồng: {certificate.ContractName}", fontNormal));
+            PdfPCell contractName = new PdfPCell(new Phrase($"Contract Name: {certificate.ContractName}", fontNormal));
             contractName.Colspan = 3;
             contractName.BorderWidth = 0f;
             contractName.PaddingBottom = 3f;
@@ -137,26 +137,26 @@ namespace EC.Manager.FileStoring
             string statusName = "";
             switch (certificate.Status)
             {
-                case ContractStatus.Draft: statusName = "Bản nháp"; break;
-                case ContractStatus.Inprogress: statusName = "Đang chờ ký"; break;
-                case ContractStatus.Complete: statusName = "Hoàn thành"; break;
-                case ContractStatus.Cancelled: statusName = "Đã hủy"; break;
+                case ContractStatus.Draft: statusName = "Draft"; break;
+                case ContractStatus.Inprogress: statusName = "In progress"; break;
+                case ContractStatus.Complete: statusName = "Completed"; break;
+                case ContractStatus.Cancelled: statusName = "Cancelled"; break;
                 default: statusName = ""; break;
             }
 
-            PdfPCell status = new PdfPCell(new Phrase($"Trạng thái: {statusName}", fontNormal));
+            PdfPCell status = new PdfPCell(new Phrase($"Status: {statusName}", fontNormal));
             status.Colspan = 3;
             status.BorderWidth = 0f;
             status.PaddingBottom = 3f;
             table.AddCell(status);
 
-            PdfPCell creationUser = new PdfPCell(new Phrase($"Người tạo: {certificate.CreatorEmail}", fontNormal));
+            PdfPCell creationUser = new PdfPCell(new Phrase($"Creator: {certificate.CreatorEmail}", fontNormal));
             creationUser.Colspan = 3;
             creationUser.BorderWidth = 0f;
             creationUser.PaddingBottom = 3f;
             table.AddCell(creationUser);
 
-            PdfPCell creationTime = new PdfPCell(new Phrase($"Thời gian tạo: {certificate.CreationTime.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
+            PdfPCell creationTime = new PdfPCell(new Phrase($"Creation Time: {certificate.CreationTime.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
             creationTime.Colspan = 3;
             creationTime.BorderWidth = 0f;
             creationTime.PaddingBottom = 3f;
@@ -164,7 +164,7 @@ namespace EC.Manager.FileStoring
 
             if (certificate.ExpriredTime.HasValue)
             {
-                PdfPCell expireTime = new PdfPCell(new Phrase($"Thời hạn ký: {certificate.ExpriredTime.Value.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
+                PdfPCell expireTime = new PdfPCell(new Phrase($"Signing Deadline: {certificate.ExpriredTime.Value.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
                 expireTime.Colspan = 3;
                 expireTime.BorderWidth = 0f;
                 expireTime.PaddingBottom = 3f;
@@ -176,7 +176,7 @@ namespace EC.Manager.FileStoring
             //expriedTime.BorderWidth = 0f;
             //table.AddCell(expriedTime);
 
-            PdfPCell localTimeName = new PdfPCell(new Phrase($"Múi giờ: {localTimeZone.DisplayName}", fontNormal));
+            PdfPCell localTimeName = new PdfPCell(new Phrase($"Timezone: {localTimeZone.DisplayName}", fontNormal));
             localTimeName.Colspan = 3;
             localTimeName.BorderWidth = 0f;
             localTimeName.PaddingBottom = 10f;
@@ -186,9 +186,9 @@ namespace EC.Manager.FileStoring
 
             if (certificate.Signatures.Count > 0)
             {
-                PdfPCell signerTitle = new PdfPCell(new Phrase("Người ký", fontBold));
-                PdfPCell timestampTitle = new PdfPCell(new Phrase("Thời gian", fontBold));
-                PdfPCell signatureTitle = new PdfPCell(new Phrase("Chữ ký", fontBold));
+                PdfPCell signerTitle = new PdfPCell(new Phrase("Signer", fontBold));
+                PdfPCell timestampTitle = new PdfPCell(new Phrase("Time", fontBold));
+                PdfPCell signatureTitle = new PdfPCell(new Phrase("Signature", fontBold));
 
                 signerTitle.BorderWidth = 0f;
                 timestampTitle.BorderWidth = 0f;
@@ -247,7 +247,7 @@ namespace EC.Manager.FileStoring
                         table.AddCell(id);
                     }
 
-                    PdfPCell sent = new PdfPCell(new Phrase("Thời gian gửi:", fontNormal));
+                    PdfPCell sent = new PdfPCell(new Phrase("Sent at:", fontNormal));
                     sent.BorderWidth = 0f;
                     table.AddCell(sent);
 
@@ -255,7 +255,7 @@ namespace EC.Manager.FileStoring
                     sendingTime.BorderWidth = 0f;
                     table.AddCell(sendingTime);
 
-                    PdfPCell signed = new PdfPCell(new Phrase("Thời gian ký:", fontNormal));
+                    PdfPCell signed = new PdfPCell(new Phrase("Signed at:", fontNormal));
                     signed.BorderWidth = 0f;
                     signed.PaddingBottom = 10f;
                     table.AddCell(signed);

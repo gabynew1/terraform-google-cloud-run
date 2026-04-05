@@ -1,4 +1,4 @@
-﻿using Abp.Domain.Uow;
+using Abp.Domain.Uow;
 using Abp.MultiTenancy;
 using Abp.Runtime.Session;
 using Abp.UI;
@@ -50,95 +50,103 @@ namespace EC.Manager.Public
 
         public async Task<CreatePublicContractDto> CreateContract(string apiKey, CreatePublicContractDto input)
         {
-            ApiKey userAccess = default;
-
-            using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
+            try
             {
-                userAccess = await WorkScope.GetAll<ApiKey>()
-               .Where(x => x.Value.ToLower().Trim() == apiKey.ToLower().Trim())
-               .FirstOrDefaultAsync();
-            }
+                ApiKey userAccess = default;
 
-            if (userAccess == default)
-            {
-                throw new UserFriendlyException("Api key not valid!");
-            }
-
-            if (string.IsNullOrEmpty(input.FileBase64))
-            {
-                throw new UserFriendlyException("File not valid");
-            }
-
-            if (!input.FileBase64.Contains(","))
-            {
-                input.FileBase64 = "data:application/pdf;base64," + input.FileBase64;
-            }
-
-            if (!input.FileName.Contains("."))
-            {
-                input.FileName += ".pdf";
-            }
-
-            _abpSession.Use(userAccess.TenantId, userAccess.UserId);
-            var uow = _unitOfWork.Current;
-
-            using (uow.SetTenantId(userAccess.TenantId))
-            {
-                var loginUserId = userAccess.UserId;
-
-                var loginUserEmail = await WorkScope.GetAll<User>()
-                    .Where(x => x.Id == loginUserId)
-                    .Select(x => x.EmailAddress)
-                    .FirstOrDefaultAsync();
-
-                var guid = Guid.NewGuid();
-                var entity = new Contract()
+                using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
                 {
-                    Status = ContractStatus.Draft,
-                    UserId = loginUserId,
-                    ExpriredTime = input.ExpriedTime,
-                    ContractGuid = guid,
-                    Code = input.Code,
-                    File = input.FileName,
-                    Name = input.Name,
-                };
+                    userAccess = await WorkScope.GetAll<ApiKey>()
+                   .Where(x => x.Value.ToLower().Trim() == apiKey.ToLower().Trim())
+                   .FirstOrDefaultAsync();
+                }
 
-                entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
-
-                var location = new SignPositionDto
+                if (userAccess == default)
                 {
-                    PositionX = 20,
-                    PositionY = 10,
-                    Page = 1
-                };
-                var fillInput = new FillInputDto
-                {
-                    Color = "black",
-                    Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
-                    FontSize = 10,
-                    PageHeight = 0,
-                    SignerSignatureSettingId = 1,
-                    IsCreateContract = true
-                };
-                var base64 = await SignUtils.FillPdfWithText(fillInput, location, input.FileBase64, _webHostEnvironment.WebRootPath);
-                var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
-                await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
+                    throw new UserFriendlyException("Api key not valid!");
+                }
 
-                var history = new CreaContractHistoryDto
+                if (string.IsNullOrEmpty(input.FileBase64))
                 {
-                    Action = HistoryAction.CreateContract,
-                    AuthorEmail = loginUserEmail,
-                    ContractId = entity.Id,
-                    ContractStatus = ContractStatus.Draft,
-                    TimeAt = DateTimeUtils.GetNow(),
-                    Note = $"{loginUserEmail} createdTheDocument"
-                };
-                await _contractHistoryManager.Create(history);
+                    throw new UserFriendlyException("File not valid");
+                }
 
-                uow.SaveChanges();
+                if (!input.FileBase64.Contains(","))
+                {
+                    input.FileBase64 = "data:application/pdf;base64," + input.FileBase64;
+                }
+
+                if (!input.FileName.Contains("."))
+                {
+                    input.FileName += ".pdf";
+                }
+
+                _abpSession.Use(userAccess.TenantId, userAccess.UserId);
+                var uow = _unitOfWork.Current;
+
+                using (uow.SetTenantId(userAccess.TenantId))
+                {
+                    var loginUserId = userAccess.UserId;
+
+                    var loginUserEmail = await WorkScope.GetAll<User>()
+                        .Where(x => x.Id == loginUserId)
+                        .Select(x => x.EmailAddress)
+                        .FirstOrDefaultAsync();
+
+                    var guid = Guid.NewGuid();
+                    var entity = new Contract()
+                    {
+                        Status = ContractStatus.Draft,
+                        UserId = loginUserId,
+                        ExpriredTime = input.ExpriedTime,
+                        ContractGuid = guid,
+                        Code = input.Code,
+                        File = input.FileName,
+                        Name = input.Name,
+                    };
+
+                    entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
+
+                    var location = new SignPositionDto
+                    {
+                        PositionX = 20,
+                        PositionY = 10,
+                        Page = 1
+                    };
+                    var fillInput = new FillInputDto
+                    {
+                        Color = "#000000",
+                        Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
+                        FontSize = 10,
+                        PageHeight = 0,
+                        SignerSignatureSettingId = 1,
+                        IsCreateContract = true
+                    };
+                    var base64 = await SignUtils.FillPdfWithText(fillInput, location, input.FileBase64, _webHostEnvironment.WebRootPath);
+                    var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
+                    await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
+
+                    var history = new CreaContractHistoryDto
+                    {
+                        Action = HistoryAction.CreateContract,
+                        AuthorEmail = loginUserEmail,
+                        ContractId = entity.Id,
+                        ContractStatus = ContractStatus.Draft,
+                        TimeAt = DateTimeUtils.GetNow(),
+                        Note = $"{loginUserEmail} created document"
+                    };
+                    await _contractHistoryManager.Create(history);
+
+                    uow.SaveChanges();
+                }
+
+                return input;
             }
-
-            return input;
+            catch (Exception ex)
+            {
+                Logger.Error("Error in Public CreateContract: " + ex.Message, ex);
+                throw new UserFriendlyException("Failed to create contract: " + ex.Message);
+            }
         }
     }
 }

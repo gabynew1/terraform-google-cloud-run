@@ -65,7 +65,7 @@ export class EmailLoginValidatorComponent extends AppComponentBase implements On
   handleLoginMicrosoft() {
     const loginRequest = {
       scopes: ["openid", "profile"],
-      prompt: "select_account", // Tắt chế độ tự động đăng nhập
+      prompt: "select_account", // Disable auto login mode
       
     };
     this.msalService.loginPopup(loginRequest).subscribe((value) => {

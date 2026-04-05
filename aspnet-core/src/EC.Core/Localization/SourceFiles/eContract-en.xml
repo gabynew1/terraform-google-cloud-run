@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
   <texts>
 	<text name="Home" value="Home" />
@@ -310,7 +310,7 @@
 	  <text name="CannelContract" value="Canned contract" />
 	  <text name="CannelContractAt" value="Contract cannel at" />
 	  <text name="SetSigningOrde" value="Set signing order" />
-	  <text name="SignDocument" value="Ký tài liệu" />
+	  <text name="SignDocument" value="Sign document" />
 	  <text name="ACopyDocument" value="A copy document" />
 	  <text name="YouHadDocumentNeedSign" value="You had document need sign" />
 	  <text name="CoordinatesX" value="Coordinates X" />

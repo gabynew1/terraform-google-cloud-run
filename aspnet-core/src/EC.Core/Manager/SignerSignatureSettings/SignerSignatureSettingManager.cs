@@ -1,4 +1,4 @@
-﻿using Abp.UI;
+using Abp.UI;
 using EC.Authorization.Users;
 using EC.Entities;
 using EC.Manager.Contracts;
@@ -263,11 +263,11 @@ namespace EC.Manager.SignerSignatureSettings
                 if (isCreator && contract.contractStatus != ContractStatus.Inprogress) { }
                 if (isCreator && contract.contractStatus == ContractStatus.Inprogress)
                 {
-                    throw new UserFriendlyException($"Email hiện tại không có quyền truy cập tài liệu, hãy đăng nhập lại");
+                    throw new UserFriendlyException($"Current email does not have permission to access the document, please log in again");
                 }
                 if (!isCreator)
                 {
-                    throw new UserFriendlyException($"Email hiện tại không có quyền truy cập tài liệu, hãy đăng nhập lại");
+                    throw new UserFriendlyException($"Current email does not have permission to access the document, please log in again");
                 }
             }
 
@@ -351,7 +351,7 @@ namespace EC.Manager.SignerSignatureSettings
             var AWSBase64 = await _fileStoringManager.DownloadUnsignedContractBase64(contractId);
             if (contract == default)
             {
-                throw new UserFriendlyException("Không tìm thấy hợp đồng");
+                throw new UserFriendlyException("Contract not found");
             }
 
             var signatureSettings = await WorkScope.GetAll<SignerSignatureSetting>()

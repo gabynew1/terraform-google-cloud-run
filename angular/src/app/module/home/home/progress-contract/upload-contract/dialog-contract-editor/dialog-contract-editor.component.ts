@@ -24,8 +24,8 @@ export class DialogContractEditorComponent extends DialogComponentBase<any> impl
 
   // handleSaveContractTemplate() {
   //   let contractPayload: ContractTempaleteDto = {
-  //     name: 'Mẫu hợp đồng',
-  //     fileName: 'Mẫu hợp đồng.pdf',
+  //     name: 'Contract Template',
+  //     fileName: 'Contract Template.pdf',
   //     content: "",
   //     htmlContent: this.contractTemplate,
   //     type: ContractTemplateType.Me,

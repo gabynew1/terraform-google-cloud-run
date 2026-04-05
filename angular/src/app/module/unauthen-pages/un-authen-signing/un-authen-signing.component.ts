@@ -200,7 +200,7 @@ export class UnAuthenSigningComponent
 
   updateScale() {
     const targetWidth = 820
-    const screenWidth = window.innerWidth; // Chiều rộng màn hình hiện tại
+    const screenWidth = window.innerWidth; // Current screen width
     const scaleX = screenWidth / 1224;
     this.scaleValue = screenWidth <= targetWidth ? scaleX : 1;
   }

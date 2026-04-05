@@ -32,9 +32,9 @@ const isIE =
   export function MSALInstanceFactory(configService: AppSessionService): IPublicClientApplication {
     return new PublicClientApplication({
       auth: {
-        clientId: configService.microsoftClientId, // Sử dụng clientId từ API
-        authority: 'https://login.microsoftonline.com/common', // Thay thế bằng URL authority của bạn
-        redirectUri: '/' // Thay thế bằng redirect URI của ứng dụng của bạn
+        clientId: configService.microsoftClientId, // Use clientId from API
+        authority: 'https://login.microsoftonline.com/common', // Replace with your authority URL
+        redirectUri: '/' // Replace with your application's redirect URI
       },
       cache: {
         cacheLocation: 'localStorage',

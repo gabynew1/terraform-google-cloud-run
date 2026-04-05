@@ -67,7 +67,7 @@ export class UploadTemplateComponent implements OnInit {
         () => {
           this.isConverting = false;
           this.isUploadComplete = true;
-          abp.message.error("convert file không thành công, hãy thử lại!")
+          abp.message.error("file conversion unsuccessful, please try again!")
         }
       );
       return;

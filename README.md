@@ -1,277 +1,148 @@
-
-  
-
 # Metasign
 
-## Support community
-https://mezon.ai/invite/1840698395413450752
-
-## Overview
-Metasign is an e-contract solution to bring businesses and individuals a superior experience when engaging in contracts, and optimizing operation and management systems. 
-
-Metasign can serve a wide range of customers' needs:
- - Creating different types of contracts easily
- - Delivering and getting back completed contracts via online channels
- - Storing, tracking, and managing contracts in a more convenient manner
- - Generating reports
- - Creating contracts in a batch
-
-## High level design
-
-![navbar](_screenshots/signServer.png)
-
- 
-## Table of Contents
-
-- [Metasign](#metasign)
-
-
-- [Overview](#overview)
-
-
-- [High level design](#signServer)
-
-
-- [Table of Contents](#table-of-contents)
-
-  
-
-    - [Getting Started](#getting-started)
-
-  
-
-    - [Prerequisites](#prerequisites)
-
-  
-
-    - [Clone project](#clone-project)
-
-  
-
-    - [Backend Setup](#backend-setup)
-
-  
-
-    - [Frontend Setup](#frontend-setup)
-
-  
-
-    - [Building](#building)
-
-  
-
-    - [Running](#running)
-
-  
-
-    - [Screenshot Tutorial](#screenshot-tutorial)
-
-  
-
-    - [Admin page](#admin-page)
-
-  
-
-    - [Basic user page](#basic-user-page)
-
-  
-
-  
-
-## Getting Started
-
-  
-
-  
-
-### Prerequisites
-
-  
-
-  
-
-Before you begin, ensure you have met the following requirements:
-
-  
-
-  
-
-- [Visual Studio 2022](https://visualstudio.microsoft.com/) installed.
-
-  
-
-- [.NET 6 SDK or ASP.NET Core RunTime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) installed.
-
-
-- [Visual Studio Code](https://code.visualstudio.com/) installed.
-
-  
-
-- [Node.js 14.21.2](https://nodejs.org/en/blog/release/v14.21.2) and npm (Node.js Package Manager) installed.
-
-  
-
--  [PostgresSQL](https://www.postgresql.org/download/) installed.
-
-  
-
-  
-
-### Clone project
-
-  
-
-1. **Create a folder** to store the backend and frontend code.
-
-  
-
-- example: folder `metasign`
-
-  
-
-  
-
-2. **Open a command prompt** in the created folder.
-
-  
-
-  
-
-3. **Clone the backend repository** using the following command:
-
-  
-
-  
+An e-contract platform for businesses and individuals to create, deliver, sign, store, and manage contracts digitally.
+
+## Features
+
+- Create and manage different types of contracts
+- Deliver contracts for signing via online channels (email, link)
+- Electronic & digital signatures
+- Batch contract signing
+- Contract tracking, reporting, and history
+- Google OAuth login
+
+---
+
+## Architecture
+
+**Single Docker image** serving both the Angular frontend (embedded in `wwwroot`) and the .NET 6 backend. Deployed on **Google Cloud Run**, with **Supabase** (PostgreSQL) as the database.
+
+```
+┌─────────────────────────────────────────┐
+│           Google Cloud Run              │
+│  ┌──────────────────────────────────┐   │
+│  │  .NET 6 Web Host (port 8080)     │   │
+│  │   ├── API endpoints              │   │
+│  │   └── Serves Angular (wwwroot)   │   │
+│  └──────────────────────────────────┘   │
+└─────────────────────────────────────────┘
+              │
+              ▼
+     Supabase (PostgreSQL)
+```
+
+---
+
+## Prerequisites
+
+| Tool | Version |
+| :--- | :--- |
+| [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) | 6.0 |
+| [Node.js](https://nodejs.org/) | 18.x |
+| [Docker](https://www.docker.com/get-started) | 20+ |
+| [Angular CLI](https://angular.io/cli) | 12.x |
+| Supabase project | (cloud) |
+| Google Cloud project | (for Cloud Run deployment) |
+
+---
+
+## Local Development
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/ncc-erp/metasign.git
+cd metasign
 ```
 
-  
+### 2. Configure the Backend
 
-  
-
-### Backend Setup
-
-  
-
-1. Open the backend solution using **Visual Studio 2022**:
-
-  
-
-  
-
-- Launch `Visual Studio 2022`.
-
-  
-
-- Select `File` > `Open` > `Project/Solution.`
-
-  
-
-- Navigate to the backend folder within created folder `metasign` and open the solution file.
-
-  
-
-2. Restore NuGet packages:
-
-  
-
-  
-
-- In Solution Explorer, right-click the solution and select **Restore NuGet Packages**.
-
-  
-
-3. **Set the startup project:**
-
-  
-
-  
-
-- Navigate to the path `aspnet-core/src/EC.Web.Host` then right-click `metasign.Web.Host` in `Solution Explorer`.
-
-  
-
-Select **Set as StartUp Project**.
-
-  
-
-4. Update the `appsettings.json` file:
-
-
-- Open the `appsettings.json` file in the backend project.
-
-
-- Locate the `ConnectionStrings` section.
-
-
-- Update the **Default** connection string to match your local database information:
- 
+Edit `aspnet-core/src/EC.Web.Host/appsettings.json`:
 
 ```json
 {
-"ConnectionStrings":  {
-"Default":  "Host=localhost;Port=5432;Database=metasign;User ID=yourUID;Password=yourPW;Pooling=true;"
-},
-// ... other settings ...
+  "ConnectionStrings": {
+    "Default": "Host=<your-supabase-host>;Port=5432;Database=postgres;Username=postgres.<project-ref>;Password=<your-password>;SSL Mode=Require;Trust Server Certificate=true;"
+  },
+  "App": {
+    "ServerRootAddress": "http://localhost:44311/",
+    "ClientRootAddress": "http://localhost:4200/",
+    "CorsOrigins": "http://localhost:4200"
+  }
 }
+```
 
-```
-5. Generate your own local database :
+### 3. Run the Backend
 
-- Go to the path ` Tools` > ` NuGet Package Manager`> `Package Manager Console`
-- Change `Default project` with `src/EC.Web.Host`
-- Run terminal
 ```bash
-Update-database
+cd aspnet-core
+dotnet run --project src/EC.Web.Host/EC.Web.Host.csproj
 ```
-- **Open sql server, you can see new created database.**
-6.
-- Press `F5` or select `Debug` > `Start Debugging` to run the backend.
-- Press `Ctrl + f5` or select `Debug` > `Start without Debugging` to run the backend without debug
-**Default port backend**: `http://localhost:44311/`
-### Frontend Setup
-1. Open Front-end repository
-- Select `metasign` folder > `ncc-erp-metasign` > `angular`
-- open code
+
+Default backend URL: `http://localhost:44311/`
+
+### 4. Run the Frontend
+
 ```bash
-code .
-```
-2. Install Angular CLI globally:
-```bash
-npm install -g @angular/cli
-```
-3. Install frontend dependencies:
-```bash
-npm install 
-```
-4. Run front-end
-```bash
+cd angular
+npm install
 npm start
 ```
-### Building
-To build the project, follow these steps:
-1.Build the backend using `Visual Studio Code` or the `command line`.
-2.Build the frontend:
+
+Default frontend URL: `http://localhost:4200/`
+
+---
+
+## Docker (Local)
+
+Build and run the full stack as a single container:
 
 ```bash
-npm run build
+docker build -t metasign .
+docker run -p 8080:8080 \
+  -e "ConnectionStrings__Default=<your-supabase-connection-string>" \
+  metasign
 ```
-### Running
 
-To run the project, use these commands:
+Open `http://localhost:8080`
 
-1. Start the backend using `Visual Studio Code` or the `command line`.
+---
 
-2. Start the frontend:
+## Google Cloud Run Deployment
+
+CI/CD is handled by **Google Cloud Build** using `cloudbuild.yaml`.
+
+### Manual Deploy
 
 ```bash
-npm start
+# Build and push image
+gcloud builds submit --config cloudbuild.yaml \
+  --substitutions _REGION=us-central1,_REPO_NAME=metasign-repo,_SERVICE_NAME=metasign,_DB_CONNECTION_STRING="<your-supabase-connection-string>"
 ```
-# Screenshot Tutorial
 
-Check out our screenshot tutorial on how to use metasign:
-![navbar](_screenshots/MetaSign1.png)
-![navbar](_screenshots/MetaSign2.png)
-![navbar](_screenshots/MetaSign3.png)
+### Cloud Build Trigger (Automated)
+
+Set up a trigger in the [Google Cloud Console](https://console.cloud.google.com/cloud-build/triggers) pointing to your repository, using `cloudbuild.yaml`.
+
+Required substitution variables:
+| Variable | Description |
+| :--- | :--- |
+| `_REGION` | GCP region (e.g. `us-central1`) |
+| `_REPO_NAME` | Artifact Registry repository name |
+| `_SERVICE_NAME` | Cloud Run service name |
+| `_DB_CONNECTION_STRING` | Supabase PostgreSQL connection string |
+
+---
+
+## Authentication
+
+- **Username/Password** (default)
+- **Google OAuth** — configure in `appsettings.json` under `Authentication:Google`
+
+---
+
+## Screenshots
+
+![MetaSign1](_screenshots/MetaSign1.png)
+![MetaSign2](_screenshots/MetaSign2.png)
+![MetaSign3](_screenshots/MetaSign3.png)

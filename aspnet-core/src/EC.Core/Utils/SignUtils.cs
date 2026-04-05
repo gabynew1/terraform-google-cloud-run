@@ -24,12 +24,12 @@ namespace EC.Utils
         {
             if (string.IsNullOrEmpty(signatureBase64))
             {
-                throw new UserFriendlyException("Không tìm thấy ảnh đại diện chữ ký số");
+                throw new UserFriendlyException("Digital signature avatar not found");
             }
 
             if(cert == null)
             {
-                throw new UserFriendlyException("Không tìm thấy certificate");
+                throw new UserFriendlyException("Certificate not found");
             }
 
             try
@@ -56,7 +56,7 @@ namespace EC.Utils
                     iTextSharp.text.Image itextImage = iTextSharp.text.Image.GetInstance(imageBytes);
                     if(itextImage == null)
                     {
-                        throw new UserFriendlyException("Không convert được ảnh background chữ ký số");
+                        throw new UserFriendlyException("Failed to convert digital signature background image");
                     }
 
                     signatureAppearance.Image = itextImage;
@@ -67,7 +67,7 @@ namespace EC.Utils
 
                     if (externalSignature == null || chain == null)
                     {
-                        throw new UserFriendlyException("Không tạo được certificate");
+                        throw new UserFriendlyException("Failed to create certificate");
                     }
                     MakeSignature.SignDetached(signatureAppearance, externalSignature, chain, null, null, null, 0, CryptoStandard.CMS);
 
@@ -210,11 +210,19 @@ namespace EC.Utils
                     int numberOfPage = reader.NumberOfPages;
 
                     PdfContentByte content;
-                    string hex = input.Color.StartsWith("#") ? input.Color.Substring(1) : input.Color;
-                    int r = Convert.ToInt32(hex.Substring(0, 2), 16);
-                    int g = Convert.ToInt32(hex.Substring(2, 2), 16);
-                    int b = Convert.ToInt32(hex.Substring(4, 2), 16);
-                    BaseColor baseColor = new BaseColor(r, g, b);
+                    BaseColor baseColor = BaseColor.BLACK;
+                    try
+                    {
+                        string hex = input.Color.StartsWith("#") ? input.Color.Substring(1) : input.Color;
+                        if (hex.Length == 6)
+                        {
+                            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+                            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+                            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+                            baseColor = new BaseColor(r, g, b);
+                        }
+                    }
+                    catch { }
 
                     if (input.IsCreateContract.HasValue && input.IsCreateContract.Value)
                     {

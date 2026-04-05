@@ -52,7 +52,7 @@ export class SettingContractComponent
   templateContract: boolean;
   contractRoles: contractRoles[] = [
     {
-      lable: "Người Ký",
+      lable: "Signer",
       value: ContractRole.Signer,
     },
   ];
@@ -363,11 +363,11 @@ export class SettingContractComponent
       if (this.contractId) {
         this.contractService.checkHasInput(this.contractId).pipe().subscribe(rs => {
           if (rs.result.hasInput && rs.result.hasSign) {
-            abp.message.confirm('Việc thay đổi thứ tự sẽ làm mất các vị trí ký đã được thiết lập trước đó', 'Bạn có chắc chắn muốn thay đổi thứ tự ký không?', (rs) => {
+            abp.message.confirm('Changing the order will lose previously set signature positions', 'Are you sure you want to change the signing order?', (rs) => {
               if (rs) {
                 this.contractService.removeAllSignature(this.contractId).pipe().subscribe((rs) => {
                   if (rs.success) {
-                    abp.notify.success('Thay đổi thứ tự ký thành công!')
+                    abp.notify.success('Signing order changed successfully!')
                   }
                 })
               }
@@ -392,11 +392,11 @@ export class SettingContractComponent
       if (this.templateContractId) {
         this.contractTemplateService.checkHasInput(this.templateContractId).pipe().subscribe(rs => {
           if (rs.result.hasInput && rs.result.hasSign) {
-            abp.message.confirm('Việc thay đổi thứ tự sẽ làm mất các vị trí ký đã được thiết lập trước đó', 'Bạn có chắc chắn muốn thay đổi thứ tự ký không?', (rs) => {
+            abp.message.confirm('Changing the order will lose previously set signature positions', 'Are you sure you want to change the signing order?', (rs) => {
               if (rs) {
                 this.contractTemplateService.removeAllSignature(this.templateContractId).pipe().subscribe((rs) => {
                   if (rs.success) {
-                    abp.notify.success('Thay đổi thứ tự ký thành công!')
+                    abp.notify.success('Signing order changed successfully!')
                   }
                 })
               }
@@ -547,11 +547,11 @@ export class SettingContractComponent
       if (this.contractId) {
         this.contractService.checkHasInput(this.contractId).pipe().subscribe(rs => {
           if (rs.result.hasInput && rs.result.hasSign) {
-            abp.message.confirm('Việc thay đổi thứ tự sẽ làm mất các vị trí ký đã được thiết lập trước đó', 'Bạn có chắc chắn muốn thay đổi thứ tự ký không?', (rs) => {
+            abp.message.confirm('Changing the order will lose previously set signature positions', 'Are you sure you want to change the signing order?', (rs) => {
               if (rs) {
                 this.contractService.removeAllSignature(this.contractId).pipe().subscribe((rs) => {
                   if (rs.success) {
-                    abp.notify.success('Thay đổi thứ tự ký thành công!')
+                    abp.notify.success('Signing order changed successfully!')
                   }
                 })
               }
@@ -566,11 +566,11 @@ export class SettingContractComponent
       if (this.templateContractId) {
         this.contractTemplateService.checkHasInput(this.templateContractId).pipe().subscribe(rs => {
           if (rs.result.hasInput && rs.result.hasSign) {
-            abp.message.confirm('Việc thay đổi thứ tự sẽ làm mất các vị trí ký đã được thiết lập trước đó', 'Bạn có chắc chắn muốn thay đổi thứ tự ký không?', (rs) => {
+            abp.message.confirm('Changing the order will lose previously set signature positions', 'Are you sure you want to change the signing order?', (rs) => {
               if (rs) {
                 this.contractTemplateService.removeAllSignature(this.templateContractId).pipe().subscribe((rs) => {
                   if (rs.success) {
-                    abp.notify.success('Thay đổi thứ tự ký thành công!')
+                    abp.notify.success('Signing order changed successfully!')
                   }
                 })
               }

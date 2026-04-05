@@ -154,7 +154,7 @@ namespace EC.Authorization
                 var user = await UserManager.FindByNameOrEmailAsync(tenantId, emailAddress);
                 if (user == null)
                 {
-                    throw new UserFriendlyException(string.Format("Email chưa được đăng ký"));
+                    throw new UserFriendlyException(string.Format("Email has not been registered"));
                 }
 
                 if (await UserManager.IsLockedOutAsync(user))

@@ -171,8 +171,8 @@ export class EditRoleDialogComponent extends AppComponentBase
     this.onSaveData(node);
   }
 
-  // Trước khi gọi API
-  // Cho những node có trạng thái indeterminate vào list.
+  // Before calling API
+  // Add nodes with indeterminate state to the list.
   selectOrDeselectAllIndeterminateParents(doSelect: boolean) {
     this.treeControl.dataNodes.forEach((parent) => {
       this.selectOrDeselectTheIndeterminateParent(parent, doSelect);

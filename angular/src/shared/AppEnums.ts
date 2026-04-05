@@ -62,11 +62,11 @@ export enum EStatusContract {
 }
 
 export enum ENameStatusContract {
-  All = "Tất cả",
-  Draft = "Bản nháp",
-  Inprogress = "Chờ ký",
-  Completed = "Hoàn thành",
-  Cancelled = "Hủy bỏ",
+  All = "All",
+  Draft = "Draft",
+  Inprogress = "In progress",
+  Completed = "Completed",
+  Cancelled = "Cancelled",
 }
 
 export enum buttomType {

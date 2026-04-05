@@ -195,144 +195,25 @@ namespace EC.Manager.Contracts
 
         public async Task<long> Create(CreatECDto input)
         {
-            var loginUserId = AbpSession.UserId.Value;
-
-            var loginUserEmail = await WorkScope.GetAll<User>()
-                .Where(x => x.Id == loginUserId)
-                .Select(x => x.EmailAddress)
-                .FirstOrDefaultAsync();
-
-            var guid = Guid.NewGuid();
-            var entity = new Contract()
+            try
             {
-                Status = ContractStatus.Draft,
-                UserId = loginUserId,
-                ExpriredTime = input.ExpriedTime,
-                ContractGuid = guid,
-                Code = input.Code,
-                File = input.File,
-                Name = input.Name,
-            };
+                var loginUserId = AbpSession.UserId.Value;
 
-            entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
+                var loginUserEmail = await WorkScope.GetAll<User>()
+                    .Where(x => x.Id == loginUserId)
+                    .Select(x => x.EmailAddress)
+                    .FirstOrDefaultAsync();
 
-            var location = new SignPositionDto
-            {
-                PositionX = 20,
-                PositionY = 10,
-                Page = 1
-            };
-            var fillInput = new FillInputDto
-            {
-                Color = "black",
-                Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
-                FontSize = 10,
-                PageHeight = 0,
-                SignerSignatureSettingId = 1,
-                IsCreateContract = true
-            };
-            var base64 = await SignUtils.FillPdfWithText(fillInput, location, input.FileBase64, _webHostEnvironment.WebRootPath);
-            var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
-            await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
-
-            var history = new CreaContractHistoryDto
-            {
-                Action = HistoryAction.CreateContract,
-                AuthorEmail = loginUserEmail,
-                ContractId = entity.Id,
-                ContractStatus = ContractStatus.Draft,
-                TimeAt = DateTimeUtils.GetNow(),
-                Note = $"{loginUserEmail} createdTheDocument"
-            };
-            await _contractHistoryManager.Create(history);
-
-            return entity.Id;
-        }
-
-        public async Task<long> CreateContractFromTemplate(CreateContractFromTemplateDto input)
-        {
-            var loginUserId = AbpSession.UserId.Value;
-            var template = await WorkScope.GetAsync<ContractTemplate>(input.ContractTemplateId);
-
-            var loginUserEmail = await WorkScope.GetAll<User>()
-                .Where(x => x.Id == loginUserId)
-                .Select(x => x.EmailAddress)
-                .FirstOrDefaultAsync();
-
-            var guid = Guid.NewGuid();
-
-            var entity = new Contract
-            {
-                Name = input.Name,
-                Code = input.Code,
-                Status = ContractStatus.Draft,
-                UserId = loginUserId,
-                File = template.Name + ".pdf",
-                ContractTemplateId = input.ContractTemplateId,
-                ExpriredTime = input.ExpriedTime,
-                ContractGuid = guid,
-            };
-
-            entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
-
-            var location = new SignPositionDto
-            {
-                PositionX = 20,
-                PositionY = 10,
-                Page = 1
-            };
-            var fillInput = new FillInputDto
-            {
-                Color = "black",
-                Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
-                FontSize = 10,
-                PageHeight = 0,
-                SignerSignatureSettingId = 1,
-                IsCreateContract = true
-            };
-            var base64 = await SignUtils.FillPdfWithText(fillInput, location, template.Content, _webHostEnvironment.WebRootPath);
-            var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
-            await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
-
-            var history = new CreaContractHistoryDto
-            {
-                Action = HistoryAction.CreateContract,
-                AuthorEmail = loginUserEmail,
-                ContractId = entity.Id,
-                ContractStatus = ContractStatus.Draft,
-                TimeAt = DateTimeUtils.GetNow(),
-                Note = $"{loginUserEmail} đã tạo tài liệu"
-            };
-            await _contractHistoryManager.Create(history);
-
-            return entity.Id;
-        }
-
-        public async Task CreateMassContract(CreateMassContractDto input)
-        {
-            var loginUserId = AbpSession.UserId.Value;
-            var template = WorkScope.GetAll<ContractTemplate>().Where(x => x.Id == input.Id).FirstOrDefault();
-
-            var loginUserEmail = WorkScope.GetAll<User>()
-                .Where(x => x.Id == loginUserId)
-                .Select(x => x.EmailAddress)
-                .FirstOrDefault();
-            var massGuid = Guid.NewGuid();
-            var numOfContracts = input.RowData.Count;
-            for (int i = 0; i < numOfContracts; i++)
-            {
-                #region Create Contract
-
-                var entity = new Contract
+                var guid = Guid.NewGuid();
+                var entity = new Contract()
                 {
-                    Name = input.RowData[i].Contract.Name,
                     Status = ContractStatus.Draft,
                     UserId = loginUserId,
-                    File = input.RowData[i].Contract.Name + ".pdf",
-                    ContractTemplateId = template.Id,
-                    ContractGuid = Guid.NewGuid(),
-                    MassGuid = massGuid,
-                    ExpriredTime = input.RowData[i].Contract.ExpriedTime
+                    ExpriredTime = input.ExpriedTime,
+                    ContractGuid = guid,
+                    Code = input.Code,
+                    File = input.File,
+                    Name = input.Name,
                 };
 
                 entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
@@ -345,29 +226,16 @@ namespace EC.Manager.Contracts
                 };
                 var fillInput = new FillInputDto
                 {
-                    Color = "black",
-                    Content = $"MetaSign Document ID: {entity.ContractGuid.ToString().ToUpper()}",
+                    Color = "#000000",
+                    Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
                     FontSize = 10,
                     PageHeight = 0,
                     SignerSignatureSettingId = 1,
                     IsCreateContract = true
                 };
-                var base64 = "";
-                if (!string.IsNullOrEmpty(template.MassWordContent))
-                {
-                    var base64Convert = await FillAndRepaceContent(template.MassWordContent, template.MassField, input.RowData[i].ListFieldDto);
-                    base64 = await SignUtils.FillPdfWithText(fillInput, location, base64Convert, _webHostEnvironment.WebRootPath);
-                }
-                else
-                {
-                    base64 = await SignUtils.FillPdfWithText(fillInput, location, template.Content, _webHostEnvironment.WebRootPath);
-                }
+                var base64 = await SignUtils.FillPdfWithText(fillInput, location, input.FileBase64, _webHostEnvironment.WebRootPath);
                 var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
                 await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
-
-                #endregion Create Contract
-
-                #region Create Contract History
 
                 var history = new CreaContractHistoryDto
                 {
@@ -376,58 +244,214 @@ namespace EC.Manager.Contracts
                     ContractId = entity.Id,
                     ContractStatus = ContractStatus.Draft,
                     TimeAt = DateTimeUtils.GetNow(),
-                    Note = $"{loginUserEmail} đã tạo tài liệu"
+                    Note = $"{loginUserEmail} created document"
                 };
                 await _contractHistoryManager.Create(history);
 
-                #endregion Create Contract History
+                return entity.Id;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error in Create: " + ex.Message, ex);
+                throw new UserFriendlyException("Failed to create contract: " + ex.Message);
+            }
+        }
 
-                #region Create Signer and SignatureSetting
+        public async Task<long> CreateContractFromTemplate(CreateContractFromTemplateDto input)
+        {
+            try
+            {
+                var loginUserId = AbpSession.UserId.Value;
+                var template = await WorkScope.GetAsync<ContractTemplate>(input.ContractTemplateId);
 
-                foreach (var item1 in input.RowData[i].Signers)
+                var loginUserEmail = await WorkScope.GetAll<User>()
+                    .Where(x => x.Id == loginUserId)
+                    .Select(x => x.EmailAddress)
+                    .FirstOrDefaultAsync();
+
+                var guid = Guid.NewGuid();
+
+                var entity = new Contract
                 {
-                    var signer = new ContractSetting
+                    Name = input.Name,
+                    Code = string.IsNullOrWhiteSpace(input.Code) ? template.Name : input.Code,
+                    Status = ContractStatus.Draft,
+                    UserId = loginUserId,
+                    File = template.Name + ".pdf",
+                    ContractTemplateId = input.ContractTemplateId,
+                    ExpriredTime = input.ExpriedTime,
+                    ContractGuid = guid,
+                };
+
+                entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
+
+                var location = new SignPositionDto
+                {
+                    PositionX = 20,
+                    PositionY = 10,
+                    Page = 1
+                };
+                var fillInput = new FillInputDto
+                {
+                    Color = "#000000",
+                    Content = $"MetaSign Document ID: {guid.ToString().ToUpper()}",
+                    FontSize = 10,
+                    PageHeight = 0,
+                    SignerSignatureSettingId = 1,
+                    IsCreateContract = true
+                };
+                var base64 = await SignUtils.FillPdfWithText(fillInput, location, template.Content, _webHostEnvironment.WebRootPath);
+                var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
+                await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
+
+                var history = new CreaContractHistoryDto
+                {
+                    Action = HistoryAction.CreateContract,
+                    AuthorEmail = loginUserEmail,
+                    ContractId = entity.Id,
+                    ContractStatus = ContractStatus.Draft,
+                    TimeAt = DateTimeUtils.GetNow(),
+                    Note = $"{loginUserEmail} created document from template"
+                };
+                await _contractHistoryManager.Create(history);
+
+                return entity.Id;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error in CreateContractFromTemplate: " + ex.Message, ex);
+                throw new UserFriendlyException("Failed to create contract from template: " + ex.Message);
+            }
+        }
+
+        public async Task CreateMassContract(CreateMassContractDto input)
+        {
+            try
+            {
+                var loginUserId = AbpSession.UserId.Value;
+                var template = WorkScope.GetAll<ContractTemplate>().Where(x => x.Id == input.Id).FirstOrDefault();
+
+                var loginUserEmail = WorkScope.GetAll<User>()
+                    .Where(x => x.Id == loginUserId)
+                    .Select(x => x.EmailAddress)
+                    .FirstOrDefault();
+                var massGuid = Guid.NewGuid();
+                var numOfContracts = input.RowData.Count;
+                for (int i = 0; i < numOfContracts; i++)
+                {
+                    #region Create Contract
+
+                    var entity = new Contract
+                    {
+                        Name = input.RowData[i].Contract.Name,
+                        Status = ContractStatus.Draft,
+                        UserId = loginUserId,
+                        File = input.RowData[i].Contract.Name + ".pdf",
+                        ContractTemplateId = template.Id,
+                        ContractGuid = Guid.NewGuid(),
+                        MassGuid = massGuid,
+                        ExpriredTime = input.RowData[i].Contract.ExpriedTime
+                    };
+
+                    entity.Id = await WorkScope.InsertAndGetIdAsync(entity);
+
+                    var location = new SignPositionDto
+                    {
+                        PositionX = 20,
+                        PositionY = 10,
+                        Page = 1
+                    };
+                    var fillInput = new FillInputDto
+                    {
+                        Color = "#000000",
+                        Content = $"MetaSign Document ID: {entity.ContractGuid.ToString().ToUpper()}",
+                        FontSize = 10,
+                        PageHeight = 0,
+                        SignerSignatureSettingId = 1,
+                        IsCreateContract = true
+                    };
+                    var base64 = "";
+                    if (!string.IsNullOrEmpty(template.MassWordContent))
+                    {
+                        var base64Convert = await FillAndRepaceContent(template.MassWordContent, template.MassField, input.RowData[i].ListFieldDto);
+                        base64 = await SignUtils.FillPdfWithText(fillInput, location, base64Convert, _webHostEnvironment.WebRootPath);
+                    }
+                    else
+                    {
+                        base64 = await SignUtils.FillPdfWithText(fillInput, location, template.Content, _webHostEnvironment.WebRootPath);
+                    }
+                    var file = CommonUtils.ConvertBase64PdfToFile(base64.Split(",")[1], entity.File);
+                    await _fileStoringManager.UploadUnsignedContract(entity.Id, file);
+
+                    #endregion Create Contract
+
+                    #region Create Contract History
+
+                    var history = new CreaContractHistoryDto
+                    {
+                        Action = HistoryAction.CreateContract,
+                        AuthorEmail = loginUserEmail,
+                        ContractId = entity.Id,
+                        ContractStatus = ContractStatus.Draft,
+                        TimeAt = DateTimeUtils.GetNow(),
+                        Note = $"{loginUserEmail} created document"
+                    };
+                    await _contractHistoryManager.Create(history);
+
+                    #endregion Create Contract History
+
+                    #region Create Signer and SignatureSetting
+
+                    foreach (var item1 in input.RowData[i].Signers)
+                    {
+                        var signer = new ContractSetting
+                        {
+                            ContractId = entity.Id,
+                            ContractRole = item1.ContractRole,
+                            SignerName = item1.Name,
+                            SignerEmail = item1.Email,
+                            Status = ContractSettingStatus.NotConfirmed,
+                            ProcesOrder = item1.ProcesOrder,
+                            Color = item1.Color,
+                            SignerMassGuid = item1.MassGuid
+                        };
+                        signer.Id = WorkScope.InsertAndGetId(signer);
+                        var signatureSetting = item1.SignatureSettings.Select(x => new SignerSignatureSetting
+                        {
+                            ContractSettingId = signer.Id,
+                            SignatureType = x.SignatureType,
+                            Page = x.Page,
+                            PositionX = x.PositionX,
+                            PositionY = x.PositionY,
+                            Width = x.Width,
+                            Height = x.Height,
+                            FontSize = x.FontSize,
+                            FontFamily = x.FontFamily,
+                            FontColor = x.FontColor,
+                            ValueInput = x.ValueInput,
+                        }).ToList();
+                        WorkScope.InsertRange(signatureSetting);
+                    }
+
+                    #endregion Create Signer and SignatureSetting
+
+                    #region Send Mail
+
+                    var sendMailDto = new SendMailDto
                     {
                         ContractId = entity.Id,
-                        ContractRole = item1.ContractRole,
-                        SignerName = item1.Name,
-                        SignerEmail = item1.Email,
-                        Status = ContractSettingStatus.NotConfirmed,
-                        ProcesOrder = item1.ProcesOrder,
-                        Color = item1.Color,
-                        SignerMassGuid = item1.MassGuid
+                        MailContent = GetContractMailContent(entity.Id)
                     };
-                    signer.Id = WorkScope.InsertAndGetId(signer);
-                    var signatureSetting = item1.SignatureSettings.Select(x => new SignerSignatureSetting
-                    {
-                        ContractSettingId = signer.Id,
-                        SignatureType = x.SignatureType,
-                        Page = x.Page,
-                        PositionX = x.PositionX,
-                        PositionY = x.PositionY,
-                        Width = x.Width,
-                        Height = x.Height,
-                        FontSize = x.FontSize,
-                        FontFamily = x.FontFamily,
-                        FontColor = x.FontColor,
-                        ValueInput = x.ValueInput,
-                    }).ToList();
-                    WorkScope.InsertRange(signatureSetting);
+                    await SendMailToViewer(sendMailDto);
+                    await SendMail(sendMailDto);
+
+                    #endregion Send Mail
                 }
-
-                #endregion Create Signer and SignatureSetting
-
-                #region Send Mail
-
-                var sendMailDto = new SendMailDto
-                {
-                    ContractId = entity.Id,
-                    MailContent = GetContractMailContent(entity.Id)
-                };
-                await SendMailToViewer(sendMailDto);
-                await SendMail(sendMailDto);
-
-                #endregion Send Mail
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error in CreateMassContract: " + ex.Message, ex);
+                throw new UserFriendlyException("Failed to create mass contract: " + ex.Message);
             }
         }
 
@@ -1146,7 +1170,7 @@ namespace EC.Manager.Contracts
             Font fontNormal = new Font(customFont, 10, Font.NORMAL);
             Font fontBold = new Font(customFont, 12, Font.BOLD);
 
-            PdfPCell signatureCertificate = new PdfPCell(new Phrase("LỊCH SỬ KÝ TÀI LIỆU", new Font(customFont, 16, Font.BOLD)));
+            PdfPCell signatureCertificate = new PdfPCell(new Phrase("DOCUMENT SIGNING HISTORY", new Font(customFont, 16, Font.BOLD)));
             signatureCertificate.Colspan = 3;
             signatureCertificate.HorizontalAlignment = Element.ALIGN_CENTER;
             signatureCertificate.BorderWidth = 0f;
@@ -1159,7 +1183,7 @@ namespace EC.Manager.Contracts
             contractGuid.PaddingBottom = 3f;
             table.AddCell(contractGuid);
 
-            PdfPCell contractName = new PdfPCell(new Phrase($"Tên hợp đồng: {certificate.ContractName}", fontNormal));
+            PdfPCell contractName = new PdfPCell(new Phrase($"Contract Name: {certificate.ContractName}", fontNormal));
             contractName.Colspan = 3;
             contractName.BorderWidth = 0f;
             contractName.PaddingBottom = 3f;
@@ -1173,26 +1197,26 @@ namespace EC.Manager.Contracts
             string statusName = "";
             switch (certificate.Status)
             {
-                case ContractStatus.Draft: statusName = "Bản nháp"; break;
-                case ContractStatus.Inprogress: statusName = "Đang chờ ký"; break;
-                case ContractStatus.Complete: statusName = "Hoàn thành"; break;
-                case ContractStatus.Cancelled: statusName = "Đã hủy"; break;
+                case ContractStatus.Draft: statusName = "Draft"; break;
+                case ContractStatus.Inprogress: statusName = "In progress"; break;
+                case ContractStatus.Complete: statusName = "Completed"; break;
+                case ContractStatus.Cancelled: statusName = "Cancelled"; break;
                 default: statusName = ""; break;
             }
 
-            PdfPCell status = new PdfPCell(new Phrase($"Trạng thái: {statusName}", fontNormal));
+            PdfPCell status = new PdfPCell(new Phrase($"Status: {statusName}", fontNormal));
             status.Colspan = 3;
             status.BorderWidth = 0f;
             status.PaddingBottom = 3f;
             table.AddCell(status);
 
-            PdfPCell creationUser = new PdfPCell(new Phrase($"Người tạo: {certificate.CreatorEmail}", fontNormal));
+            PdfPCell creationUser = new PdfPCell(new Phrase($"Creator: {certificate.CreatorEmail}", fontNormal));
             creationUser.Colspan = 3;
             creationUser.BorderWidth = 0f;
             creationUser.PaddingBottom = 3f;
             table.AddCell(creationUser);
 
-            PdfPCell creationTime = new PdfPCell(new Phrase($"Thời gian tạo: {certificate.CreationTime.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
+            PdfPCell creationTime = new PdfPCell(new Phrase($"Creation Time: {certificate.CreationTime.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
             creationTime.Colspan = 3;
             creationTime.BorderWidth = 0f;
             creationTime.PaddingBottom = 3f;
@@ -1200,7 +1224,7 @@ namespace EC.Manager.Contracts
 
             if (certificate.ExpriredTime.HasValue)
             {
-                PdfPCell expireTime = new PdfPCell(new Phrase($"Thời hạn ký: {certificate.ExpriredTime.Value.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
+                PdfPCell expireTime = new PdfPCell(new Phrase($"Signing Deadline: {certificate.ExpriredTime.Value.ToString("dd/MM/yyyy HH:mm:ss")}", fontNormal));
                 expireTime.Colspan = 3;
                 expireTime.BorderWidth = 0f;
                 expireTime.PaddingBottom = 3f;
@@ -1212,7 +1236,7 @@ namespace EC.Manager.Contracts
             //expriedTime.BorderWidth = 0f;
             //table.AddCell(expriedTime);
 
-            PdfPCell localTimeName = new PdfPCell(new Phrase($"Múi giờ: {localTimeZone.DisplayName}", fontNormal));
+            PdfPCell localTimeName = new PdfPCell(new Phrase($"Timezone: {localTimeZone.DisplayName}", fontNormal));
             localTimeName.Colspan = 3;
             localTimeName.BorderWidth = 0f;
             localTimeName.PaddingBottom = 10f;
@@ -1222,9 +1246,9 @@ namespace EC.Manager.Contracts
 
             if (certificate.Signatures.Count > 0)
             {
-                PdfPCell signerTitle = new PdfPCell(new Phrase("Người ký", fontBold));
-                PdfPCell timestampTitle = new PdfPCell(new Phrase("Thời gian", fontBold));
-                PdfPCell signatureTitle = new PdfPCell(new Phrase("Chữ ký", fontBold));
+                PdfPCell signerTitle = new PdfPCell(new Phrase("Signer", fontBold));
+                PdfPCell timestampTitle = new PdfPCell(new Phrase("Time", fontBold));
+                PdfPCell signatureTitle = new PdfPCell(new Phrase("Signature", fontBold));
 
                 signerTitle.BorderWidth = 0f;
                 timestampTitle.BorderWidth = 0f;
@@ -1283,7 +1307,7 @@ namespace EC.Manager.Contracts
                         table.AddCell(id);
                     }
 
-                    PdfPCell sent = new PdfPCell(new Phrase("Thời gian gửi:", fontNormal));
+                    PdfPCell sent = new PdfPCell(new Phrase("Sent at:", fontNormal));
                     sent.BorderWidth = 0f;
                     table.AddCell(sent);
 
@@ -1291,7 +1315,7 @@ namespace EC.Manager.Contracts
                     sendingTime.BorderWidth = 0f;
                     table.AddCell(sendingTime);
 
-                    PdfPCell signed = new PdfPCell(new Phrase("Thời gian ký:", fontNormal));
+                    PdfPCell signed = new PdfPCell(new Phrase("Signed at:", fontNormal));
                     signed.BorderWidth = 0f;
                     signed.PaddingBottom = 10f;
                     table.AddCell(signed);
@@ -1358,7 +1382,7 @@ namespace EC.Manager.Contracts
                 clonedMailContent.SendToEmail = content.Result.SendToEmail;
                 clonedMailContent.CurrentUserLoginId = AbpSession.UserId;
                 clonedMailContent.TenantId = AbpSession.TenantId;
-                var action = content.Result.ContractRole == ContractRole.Signer ? "[Ký tài liệu]" : "[Nhận một bản sao]";
+                var action = content.Result.ContractRole == ContractRole.Signer ? "[Document Signing]" : "[Receive a copy]";
                 clonedMailContent.Subject = string.IsNullOrEmpty(mailContent.Subject) ? $"{action} {content.Result.ContractName}" : mailContent.Subject;
                 clonedMailContent.BodyMessage = CommonUtils.ReplaceBodyMessage(clonedMailContent.BodyMessage, content.Result);
                 clonedMailContent.MailHistory = CreateContractHistory(contractCreator, contractId, content.Result.SendToEmail, content.Result.ContractRole, IsReSent);
@@ -1397,7 +1421,7 @@ namespace EC.Manager.Contracts
 
             bool IsReSent = true;
 
-            var action = content.Result.ContractRole == ContractRole.Signer ? "[Ký tài liệu]" : "[Nhận một bản sao]";
+            var action = content.Result.ContractRole == ContractRole.Signer ? "[Document Signing]" : "[Receive a copy]";
             mailContent.SendToEmail = signers.SignerEmail;
             mailContent.CurrentUserLoginId = AbpSession.UserId;
             mailContent.TenantId = AbpSession.TenantId;
@@ -1455,7 +1479,7 @@ namespace EC.Manager.Contracts
                 MailPreviewInfoDto mailInput = (MailPreviewInfoDto)input.MailContent.Clone();
                 mailInput.CurrentUserLoginId = AbpSession.UserId;
                 mailInput.TenantId = AbpSession.TenantId;
-                mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Ký tài liệu] {lastcontent.Result.ContractName}" : mailInput.Subject;
+                mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Document Signing] {lastcontent.Result.ContractName}" : mailInput.Subject;
                 mailInput.BodyMessage = CommonUtils.ReplaceBodyMessage(mailInput.BodyMessage, lastcontent.Result);
                 mailInput.ContractSettingId = lastcontent.Result.ContractSettingId;
                 mailInput.MailHistory = CreateContractHistory(contractCreator, input.ContractId, lastcontent.Result.SendToEmail, ContractRole.Signer);
@@ -1474,7 +1498,7 @@ namespace EC.Manager.Contracts
                     mailInput.BodyMessage = CommonUtils.ReplaceBodyMessage(mailInput.BodyMessage, content.Result);
                     mailInput.ContractSettingId = content.Result.ContractSettingId;
                     mailInput.SendToEmail = content.Result.SendToEmail;
-                    mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Ký tài liệu] {content.Result.ContractName}" : mailInput.Subject;
+                    mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Document Signing] {content.Result.ContractName}" : mailInput.Subject;
                     mailInput.MailHistory = CreateContractHistory(contractCreator, input.ContractId, content.Result.SendToEmail, ContractRole.Signer);
                     _backgroundJobManager.Enqueue<SendMail, MailPreviewInfoDto>(mailInput, BackgroundJobPriority.High, TimeSpan.FromSeconds(delaySendMail));
 
@@ -1559,7 +1583,7 @@ namespace EC.Manager.Contracts
                     mailInput.SendToEmail = content.Result.SendToEmail;
                     mailInput.CurrentUserLoginId = AbpSession.UserId;
                     mailInput.TenantId = AbpSession.TenantId;
-                    mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Nhận một bản sao] {content.Result.ContractName}" : mailInput.Subject;
+                    mailInput.Subject = string.IsNullOrEmpty(mailInput.Subject) ? $"[Receive a copy] {content.Result.ContractName}" : mailInput.Subject;
                     mailInput.BodyMessage = CommonUtils.ReplaceBodyMessage(mailInput.BodyMessage, content.Result);
                     mailInput.ContractSettingId = content.Result.ContractSettingId;
                     mailInput.MailHistory = CreateContractHistory(contractCreator, input.ContractId, notiReceivers, ContractRole.Viewer);
@@ -1623,7 +1647,7 @@ namespace EC.Manager.Contracts
             };
             var fillInput = new FillInputDto
             {
-                Color = "black",
+                Color = "#000000",
                 Content = $"MetaSign Document ID: {oldContract.ContractGuid.ToString().ToUpper()}",
                 FontSize = 10,
                 PageHeight = 0,

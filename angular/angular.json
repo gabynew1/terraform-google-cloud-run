@@ -44,7 +44,7 @@
             ],
             "scripts": [
               "node_modules/moment/min/moment.min.js",
-              "node_modules/@aspnet/signalr/dist/browser/signalr.min.js",
+              "node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
               "node_modules/sweetalert2/dist/sweetalert2.js",
               "src/assets/freeze-ui/freeze-ui.js",
               "node_modules/push.js/bin/push.min.js",
@@ -58,14 +58,19 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "allowedCommonJsDependencies": [
+              "moment",
+              "moment-timezone",
+              "pdfjs-dist"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "12kb"
                 }
               ],
               "optimization": true,
@@ -86,7 +91,7 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "12kb"
                 }
               ],
               "fileReplacements": [
@@ -150,7 +155,7 @@
             ],
             "scripts": [
               "node_modules/moment/min/moment.min.js",
-              "node_modules/@aspnet/signalr/dist/browser/signalr.min.js",
+              "node_modules/@microsoft/signalr/dist/browser/signalr.min.js",
               "node_modules/sweetalert2/dist/sweetalert2.js",
               "src/assets/freeze-ui/freeze-ui.js",
               "node_modules/push.js/bin/push.min.js",

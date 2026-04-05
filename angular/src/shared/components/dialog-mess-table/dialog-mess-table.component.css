@@ -8,7 +8,7 @@ table {
 
 .close_dialog {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 .close_dialog i {
   font-size: 30px;
