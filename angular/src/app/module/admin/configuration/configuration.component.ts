@@ -27,7 +27,6 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
   isEnableLoginByUsername: boolean = false
   isEnableNormalLogin: boolean  ;
   isEnableLoginGoogle: boolean ;
-  isEnableLoginMezon: boolean ;
  isEnableLoginMicrosoft: boolean ;
   isDisabledRemiderExpriedTime: boolean = true
   isDisabledFormSignServer: boolean = true
@@ -117,7 +116,6 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
 
   formLoginSetting = this.fb.group({ 
     enableNormalLogin: new FormControl({ value: false, disabled: true }, Validators.required),
-    enableLoginMezon: new FormControl({ value: false, disabled: true }, Validators.required),
     enableLoginGoogle: new FormControl({ value: false, disabled: true }, Validators.required),
     enableLoginMicrosoft: new FormControl({ value: false, disabled: true }, Validators.required),
    })
@@ -190,14 +188,12 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
 
     this.configurationService.getAWSCredential().subscribe(value => {
       this.formAwsS3 = value.result
-
       this.formAwsS3Credential.patchValue(value.result);
     })
-    
+
     this.configurationService.getLoginSetting().subscribe(res => {
-     this.isEnableNormalLogin = res.result.enableNormalLogin;
+      this.isEnableNormalLogin = res.result.enableNormalLogin;
       this.isEnableLoginGoogle = res.result.enableLoginGoogle;
-      this.isEnableLoginMezon = res.result.enableLoginMezon;
       this.isEnableLoginMicrosoft = res.result.enableLoginMicrosoft;
     })
     this.configurationService.getMicrosoftClientId().subscribe(value => {
@@ -269,9 +265,6 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
   checkEnableLoginGoogle(event: MatCheckboxChange) {
     this.isEnableLoginGoogle = event.checked
   }
-  checkEnableLoginMezon(event: MatCheckboxChange) {
-    this.isEnableLoginMezon = event.checked
-  }
   checkUseDefaultCredentials(event: MatCheckboxChange) {
     this.isCheckedUseDefault = event.checked
   }
@@ -290,9 +283,8 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
     var input = {
       enableNormalLogin: this.isEnableNormalLogin.toString(),
       enableLoginGoogle: this.isEnableLoginGoogle.toString(),
-      enableLoginMezon: this.isEnableLoginMezon.toString(),
       enableLoginMicrosoft: this.isEnableLoginMicrosoft.toString()
-        }
+    }
         this.configurationService.changeLoginSetting(input).subscribe(res => {
           abp.notify.success(this.ecTransform("Edit LoginSetting Successfully!"))
         })
@@ -444,7 +436,6 @@ export class ConfigurationComponent extends AppComponentBase implements OnInit {
     this.configurationService.getLoginSetting().subscribe(res => {    
       this.isEnableNormalLogin = res.result.enableNormalLogin.toLowerCase() === 'true' ? true : false
       this.isEnableLoginGoogle = res.result.enableLoginGoogle.toLowerCase() === 'true' ? true : false
-      this.isEnableLoginMezon = res.result.enableLoginMezon.toLowerCase() === 'true' ? true : false
       this.isEnableLoginMicrosoft = res.result.enableLoginMicrosoft.toLowerCase() === 'true' ? true : false
     } )
 

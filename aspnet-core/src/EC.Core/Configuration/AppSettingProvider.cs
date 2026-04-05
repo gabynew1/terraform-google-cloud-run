@@ -11,7 +11,7 @@ namespace EC.Configuration
             {
                 new SettingDefinition(AppSettingNames.UiTheme, "red", scopes: SettingScopes.Application | SettingScopes.Tenant | SettingScopes.User, clientVisibilityProvider: new VisibleSettingClientVisibilityProvider()),
                 new SettingDefinition(AppSettingNames.NotiExprireTime,"14", scopes: SettingScopes.Application| SettingScopes.Tenant, isVisibleToClients: true),
-                new SettingDefinition(AppSettingNames.GoogleClientId,"",scopes:SettingScopes.Application| SettingScopes.Tenant),
+                new SettingDefinition(AppSettingNames.GoogleClientId,"985569266142-c30ivcffpd9fmji9i3t6fds1hordh1ks.apps.googleusercontent.com",scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.IsEnableLoginByUsername, "true" ,scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.DefaultPDFSignerName, "PDFSigner01", scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.AWSAccessKeyId, "", scopes:SettingScopes.Application| SettingScopes.Tenant),
@@ -22,8 +22,7 @@ namespace EC.Configuration
                 new SettingDefinition(AppSettingNames.MicrosoftClientId,"",scopes:SettingScopes.Application|SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.SignServerBaseAddress, "", scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.SignServerAdminAPI, "", scopes:SettingScopes.Application| SettingScopes.Tenant),
-                new SettingDefinition(AppSettingNames.EnableLoginGoogle, "false", scopes:SettingScopes.Application| SettingScopes.Tenant),
-                new SettingDefinition(AppSettingNames.EnableLoginMezon, "false", scopes:SettingScopes.Application| SettingScopes.Tenant),
+                new SettingDefinition(AppSettingNames.EnableLoginGoogle, "true", scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.EnableNormalLogin, "true", scopes:SettingScopes.Application| SettingScopes.Tenant),
                 new SettingDefinition(AppSettingNames.EnableLoginMicrosoft, "false", scopes:SettingScopes.Application| SettingScopes.Tenant)
             };

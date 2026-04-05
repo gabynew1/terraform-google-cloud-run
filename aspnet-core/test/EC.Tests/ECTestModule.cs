@@ -33,7 +33,9 @@ namespace EC.Tests
             Configuration.UnitOfWork.IsTransactional = false;
 
             // Disable static mapper usage since it breaks unit tests (see https://github.com/aspnetboilerplate/aspnetboilerplate/issues/2052)
+#pragma warning disable CS0618 // UseStaticMapper is obsolete but required for test isolation in this ABP version
             Configuration.Modules.AbpAutoMapper().UseStaticMapper = false;
+#pragma warning restore CS0618
 
             Configuration.BackgroundJobs.IsJobExecutionEnabled = false;
 

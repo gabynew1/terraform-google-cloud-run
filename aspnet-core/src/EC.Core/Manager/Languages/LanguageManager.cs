@@ -17,7 +17,7 @@ namespace EC.Manager.Languages
         {
             _hostingEnvironment = hostingEnvironment;
         }
-        public async Task<object> GetCurrentUserLanguage(string currentUserLanguage)
+        public Task<object> GetCurrentUserLanguage(string currentUserLanguage)
         {
             if (currentUserLanguage == null) currentUserLanguage = "en";
             var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot", "languageSource", $"eContract-{currentUserLanguage}.xml");
@@ -38,11 +38,11 @@ namespace EC.Manager.Languages
                     localizationItems[key] = value;
                 }
             }
-            return new
+            return Task.FromResult<object>(new
             {
                 currentUserLanguage = currentUserLanguage,
                 LocalizationItems = localizationItems
-            };
+            });
         }
     }
 }

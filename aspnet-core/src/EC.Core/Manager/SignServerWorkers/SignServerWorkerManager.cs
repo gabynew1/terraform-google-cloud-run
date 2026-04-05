@@ -1,4 +1,4 @@
-﻿using EC.Configuration;
+using EC.Configuration;
 using EC.Manager.SignServerWorkers.Dto;
 using EC.WebService.SignServer;
 using HRMv2.NccCore;
@@ -60,9 +60,8 @@ namespace EC.Manager.SignServerWorkers
                     return default;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
             }
             return default;
         }
@@ -95,9 +94,8 @@ namespace EC.Manager.SignServerWorkers
                     return default;
                 }
             } 
-            catch (Exception ex)
+            catch (Exception)
             {
-
             }
             return default;
         }

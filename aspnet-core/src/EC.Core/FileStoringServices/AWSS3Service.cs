@@ -127,7 +127,7 @@ namespace EC.FileStorageServices
             }
         }
 
-        private async Task<string> GetPreSignedUrl(string key)
+        private Task<string> GetPreSignedUrl(string key)
         {
             string desiredFileName = GetFileNameFromKey(key);
             string desiredFileNameEncoded = Uri.EscapeDataString(desiredFileName);
@@ -142,10 +142,10 @@ namespace EC.FileStorageServices
                     ContentDisposition = $"attachment; filename=\"{desiredFileNameEncoded}\""
                 }
             };
-            return s3client.GetPreSignedURL(request);
+            return Task.FromResult(s3client.GetPreSignedURL(request));
         }
 
-        private async Task<List<string>> SearchForFilesByPrefix(string prefix)
+        private Task<List<string>> SearchForFilesByPrefix(string prefix)
         {
             List<byte[]> fileList = new List<byte[]>();
             var s3config= ResetCredential();
@@ -160,7 +160,7 @@ namespace EC.FileStorageServices
             {
                 result.Add(s3Object.Key);
             }
-            return result;
+            return Task.FromResult(result);
         }
 
         public async Task UploadFile(IFormFile file, string tenantName, FileCategory fileCategory, string guid, int? index)
@@ -205,7 +205,7 @@ namespace EC.FileStorageServices
             return await SearchForFilesByPrefix(prefix);
         }
 
-        private string MakeKey(string tenantName, FileCategory fileCategory, string guid, int? index, string? fileName)
+        private string MakeKey(string tenantName, FileCategory fileCategory, string guid, int? index, string fileName)
         {
             var s3config= ResetCredential();
             string key = s3config.Prefix.TrimEnd('/') + '/' + tenantName;

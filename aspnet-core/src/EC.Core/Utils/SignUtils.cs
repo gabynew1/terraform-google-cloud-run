@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
-using System;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
@@ -136,7 +135,7 @@ namespace EC.Utils
             }
         }
 
-        public static async Task<string> FillPdfWithText(FillInputDto input, SignPositionDto signLocation, string pdfBase64, string webRootPath)
+        public static Task<string> FillPdfWithText(FillInputDto input, SignPositionDto signLocation, string pdfBase64, string webRootPath)
         {
             double signPositionY = signLocation.PositionY;
 
@@ -264,7 +263,7 @@ namespace EC.Utils
                 byte[] outputBytes = outputMs.ToArray();
                 string outputBase64 = Convert.ToBase64String(outputBytes);
 
-                return "data:application/pdf;base64," + outputBase64;
+                return Task.FromResult("data:application/pdf;base64," + outputBase64);
             }
         }
 

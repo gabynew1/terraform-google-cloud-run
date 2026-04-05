@@ -28,9 +28,11 @@ namespace EC.EntityFrameworkCore.Seed.Host
             // Languages
             AddSettingIfNotExists(LocalizationSettingNames.DefaultLanguage, "en", tenantId);
 
-            // Login
-            AddSettingIfNotExists(AppSettingNames.EnableNormalLogin, "true", tenantId);
-            AddSettingIfNotExists(AppSettingNames.EnableLoginMezon, "false", tenantId);
+            // Login — use AddOrUpdateSetting to ensure these are always correctly set,
+            // even in databases that were seeded before these values were configured.
+            AddOrUpdateSetting(AppSettingNames.EnableNormalLogin, "true", tenantId);
+            AddOrUpdateSetting(AppSettingNames.EnableLoginGoogle, "true", tenantId);
+            AddOrUpdateSetting(AppSettingNames.GoogleClientId, "985569266142-c30ivcffpd9fmji9i3t6fds1hordh1ks.apps.googleusercontent.com", tenantId);
         }
 
         private void AddSettingIfNotExists(string name, string value, int? tenantId = null)
@@ -41,6 +43,23 @@ namespace EC.EntityFrameworkCore.Seed.Host
             }
 
             _context.Settings.Add(new Setting(tenantId, null, name, value));
+            _context.SaveChanges();
+        }
+
+        private void AddOrUpdateSetting(string name, string value, int? tenantId = null)
+        {
+            var existing = _context.Settings.IgnoreQueryFilters()
+                .FirstOrDefault(s => s.Name == name && s.TenantId == tenantId && s.UserId == null);
+
+            if (existing == null)
+            {
+                _context.Settings.Add(new Setting(tenantId, null, name, value));
+            }
+            else if (string.IsNullOrEmpty(existing.Value) || existing.Value != value)
+            {
+                existing.Value = value;
+            }
+
             _context.SaveChanges();
         }
     }

@@ -9,6 +9,9 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <None Update="appsettings.json;log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

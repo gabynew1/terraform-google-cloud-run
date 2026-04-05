@@ -1,4 +1,4 @@
-﻿using Abp.Application.Services.Dto;
+using Abp.Application.Services.Dto;
 using System;
 using System.Collections.Generic;
 using static EC.Constants.Enum;
@@ -43,7 +43,7 @@ namespace EC.Manager.SignerSignatureSettings.Dto
 
     public class GetSigningSignatureSettingDto : GetSignerSignatureSettingDto
     {
-        public bool IsAllowSigning { get; set; }
+        public new bool IsAllowSigning { get; set; }
     }
 
     public class GetContractSignatureDefaultDto

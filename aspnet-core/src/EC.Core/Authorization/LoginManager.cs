@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Abp.Authorization;
 using Abp.Authorization.Users;
 using Abp.Configuration;
@@ -25,7 +25,6 @@ using System.Net.Http;
 using System.IdentityModel.Tokens.Jwt;
 using static EC.Constants.Enum;
 using Microsoft.Extensions.Configuration;
-using EC.WebService.Mezon.Dto;
 
 namespace EC.Authorization
 {
@@ -91,43 +90,6 @@ namespace EC.Authorization
             return result;
         }
 
-        [UnitOfWork]
-        public async Task<AbpLoginResult<Tenant,User>> LoginAsyncNoPassWithMezon(AuthOauth2Mezon input, string tenancyName = null , bool shouldLockout = true)
-        {
-          
-            var result = await LoginAsyncWithMezon(tenancyName, shouldLockout, input);
-            var user = result.User;
-            SaveLoginAttempt(result, tenancyName, user == null ? null : user.EmailAddress);
-            return result;
-        }
-
-        public async Task<AbpLoginResult<Tenant,User>> LoginAsyncWithMezon(string tenancyName, bool shouldLockout, AuthOauth2Mezon input)
-        {
-          
-            try
-            {
-                var emailAddress = input.sub;
-                var clientAppId = _configuration.GetValue<string>("Oauth2Mezon:CLient_Id");
-                var corectAudience = input.aud.Any(s => s== clientAppId);
-                var correctIssuer = input.iss == "https://oauth2.mezon.ai";
-                var correctExpriryTime = input.auth_time != null || input.auth_time > 0 ;
-
-                Tenant tenant = null;
-
-                if(corectAudience && correctExpriryTime &&  correctIssuer)
-                {
-                    return await ValidateAndLoginUserAsync(tenant, emailAddress,tenancyName, shouldLockout);
-                }
-                else
-                {
-                    return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
-                }
-            }catch(InvalidJwtException e)
-            {
-                return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
-            }
-        }
-
         public async Task<AbpLoginResult<Tenant, User>> LoginAsyncInternalNoPass(string token, string secretCode, string tenancyName, bool shouldLockout)
         {
             if (token.IsNullOrEmpty())
@@ -156,7 +118,7 @@ namespace EC.Authorization
                     return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
                 }
             }
-            catch (InvalidJwtException e)
+            catch (InvalidJwtException)
             {
                 return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
             }

@@ -1,4 +1,4 @@
-﻿using EC.Entities;
+using EC.Entities;
 using EC.Manager.ContractHistories.Dto;
 using HRMv2.NccCore;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +35,8 @@ namespace EC.Manager.ContractHistories
 
         public async Task<List<GetContractHistoryDto>> GetAll()
         {
-            return IQContractHistory()
-                .ToList();
+            return await IQContractHistory()
+                .ToListAsync();
         }
 
         public async Task<GetContractHistoryDto> Get(long id)

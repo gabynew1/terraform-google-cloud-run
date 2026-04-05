@@ -1,4 +1,4 @@
-﻿using Abp.UI;
+using Abp.UI;
 using Castle.Core.Logging;
 using EC.Constants.Wokers;
 using EC.WebService.Goggle.Dto;
@@ -91,7 +91,7 @@ namespace EC.WebService
                 //_logger.Info($"Get: {fullUrl} response: {responseContent}");
                 return JsonConvert.DeserializeObject<T>(responseContent);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //_logger.Error($"Get: {fullUrl} error: {ex.Message}");
             }

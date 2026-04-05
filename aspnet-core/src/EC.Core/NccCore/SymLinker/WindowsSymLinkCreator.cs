@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
+
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -12,7 +12,6 @@ namespace NccCore.SymLinker
         //[DllImport("kernel32.dll", SetLastError = true)]
         [DllImport("kernel32.dll", EntryPoint = "CreateSymbolicLinkW", CharSet = CharSet.Unicode)]
         public static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymLinkFlag dwFlags);
-        [HandleProcessCorruptedStateExceptions]
         public bool CreateSymLink(string linkPath, string targetPath, bool file)
         {
             //var linkName = Path.GetFileName(targetPath);

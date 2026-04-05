@@ -1,4 +1,4 @@
-﻿using Abp.Authorization;
+using Abp.Authorization;
 using Abp.Net.Mail;
 using Abp.Runtime.Session;
 using EC.Configuration.Dto;
@@ -140,9 +140,7 @@ namespace EC.Configuration
             return new LoginSettingDto
             {
                 EnableNormalLogin = bool.Parse(await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableNormalLogin)),
-                MezonClientId = _configuration.GetValue<string>("Oauth2Mezon:Client_Id"),
                 EnableLoginGoogle = bool.Parse(await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableLoginGoogle)),
-                EnableLoginMezon = bool.Parse(await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableLoginMezon)),
                 EnableLoginMicrosoft = bool.Parse(await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableLoginMicrosoft))
 
             };
@@ -153,7 +151,6 @@ namespace EC.Configuration
         public async Task ChangeLoginSetting(LoginSettingDto loginSetting)
         {
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableNormalLogin, loginSetting.EnableNormalLogin.ToString());
-            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableLoginMezon, loginSetting.EnableLoginMezon.ToString());
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableLoginGoogle, loginSetting.EnableLoginGoogle.ToString());
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableLoginMicrosoft, loginSetting.EnableLoginMicrosoft.ToString());
         }

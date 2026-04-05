@@ -47,7 +47,7 @@ namespace EC.Manager.FileStoring
             } while (count == 0);
         }
 
-        public async Task WaitForDeletingFiles(FileCategory fileCategory, string guid, int? index, string? fileName)
+        public async Task WaitForDeletingFiles(FileCategory fileCategory, string guid, int? index, string fileName)
         {
             int count;
             do

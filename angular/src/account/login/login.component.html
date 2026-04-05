@@ -119,15 +119,6 @@
       <p *ngIf="!tenancyName" class="login_btn--text">
         {{ "orLoginInformation" | ecTranslate }}
       </p>
-      <button mat-flat-button
-      class="button w-100 button-login mezon-button"
-      type="button"
-      (click)="signInWithMezon()"
-      color="primary">
-          <img src="assets/img/mezon-logo.svg" alt="Mezon Logo" class="logo" />
-          Mezon
-       </button>
-
 
       <div class="login_btn--app">
         <app-buttom-login *ngIf="isEnableLoginByGoogle" class="btn_login" (click)="handleLoginGoogle()" [type]="buttomType.login" text="Google">
